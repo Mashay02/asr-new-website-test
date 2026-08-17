@@ -211,38 +211,51 @@ section{padding:clamp(4rem,9vh,7rem) 0}
 .svc-tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;color:var(--coil-lt);
   text-transform:uppercase}
 
-/* ————— signature: the pull-down ————— */
-.sig-wrap{height:220vh}
+/* ————— signature: the callout, scrubbed ————— */
+.sig-wrap{height:480vh}
 .sig{position:sticky;top:0;min-height:100svh;display:flex;align-items:center;overflow:hidden}
 .sig-frost{position:absolute;inset:-6%;opacity:.35;pointer-events:none;will-change:transform,opacity;
   background:
     radial-gradient(60% 55% at 0% 100%,rgba(127,196,234,.22) 0%,transparent 60%),
     radial-gradient(55% 50% at 100% 0%,rgba(127,196,234,.16) 0%,transparent 55%)}
-.sig-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;
-  gap:clamp(2rem,5vw,4.5rem);align-items:center;width:100%}
-.ticket{border:1px solid var(--line);border-radius:14px;background:var(--panel);
-  padding:1.6rem clamp(1.2rem,2.5vw,2rem)}
+.sig-stack{position:relative;display:flex;flex-direction:column;gap:1.1rem;width:100%}
 .ticket-head{font-family:var(--mono);font-size:.76rem;letter-spacing:.14em;
-  text-transform:uppercase;color:var(--coil-lt);border-bottom:1px solid var(--line);
-  padding-bottom:.9rem;margin-bottom:.4rem}
-.tick-line{display:grid;grid-template-columns:4.2rem 1fr;gap:1rem;
-  padding:.95rem 0;border-bottom:1px dashed rgba(233,243,247,.08)}
-.tick-line:last-of-type{border-bottom:0}
-.tick-line time{font-family:var(--mono);font-size:.85rem;font-weight:500;color:var(--copper)}
-.tick-line p{font-size:.95rem;color:var(--frost)}
-.sig-side{text-align:center}
+  text-transform:uppercase;color:var(--coil-lt)}
+.scene-frame{border:1px solid var(--line);border-radius:14px;background:rgba(9,26,35,.5);overflow:hidden}
+#scene{display:block;width:100%;height:clamp(230px,38vh,420px)}
+#scene text.scene-txt{font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+  fill:#8AA3B2;stroke:none}
+#worldFar,#worldMid,#worldMain,#van,#wheelA,#wheelB,#pubFan{will-change:transform}
+.sig-strip{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:1.1rem;align-items:stretch}
+.tick-line{border-left:2px solid rgba(233,243,247,.12);padding:.15rem 0 .15rem .85rem}
+.tick-line time{font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--copper);display:block}
+.tick-line p{font-size:.84rem;color:var(--frost);line-height:1.5;margin-top:.3rem}
+.sig-inst{text-align:right;min-width:150px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center}
 .sig-readout{font-family:var(--mono);font-weight:500;color:var(--frost);
-  font-size:clamp(3.4rem,7.5vw,6rem);line-height:1;letter-spacing:-.02em}
-.sig-readout small{font-size:.35em;color:var(--steel);vertical-align:.9em;margin-left:.15em}
-#sigBar{display:block;height:4px;border-radius:2px;margin:1.3rem auto 0;max-width:280px;
+  font-size:clamp(2rem,3vw,2.8rem);line-height:1;letter-spacing:-.02em}
+.sig-readout small{font-size:.4em;color:var(--steel);vertical-align:.8em;margin-left:.15em}
+#sigBar{display:block;height:4px;border-radius:2px;margin-top:.8rem;width:150px;
   background:linear-gradient(90deg,var(--copper),var(--coil-lt));
   transform-origin:0 50%;will-change:transform}
-.sig-cap{margin-top:1rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;
+.sig-cap{margin-top:.6rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;
   text-transform:uppercase;color:var(--steel)}
-.sig-close{margin-top:2rem;font-size:1.02rem}
+.sig-close{font-size:1rem}
 .sig-close a{color:var(--copper);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(201,98,43,.4)}
 @media (hover:hover){.sig-close a:hover{border-bottom-color:var(--copper)}}
-@media (max-width:899.98px){.sig-grid{grid-template-columns:1fr}.sig-side{order:-1}}
+@media (max-width:899.98px){
+  .sig-strip{grid-template-columns:1fr 1fr;gap:.9rem}
+  .sig-inst{grid-column:1/-1;flex-direction:row;align-items:baseline;gap:1rem;justify-content:flex-start}
+  #sigBar{margin-top:0;align-self:center}
+  .sig-cap{margin-top:0}
+  .tick-line p{font-size:.8rem}
+}
+@media (max-width:479.98px){
+  .sig-strip{grid-template-columns:1fr;gap:.6rem}
+  .sig-stack{gap:.8rem}
+  #scene{height:clamp(170px,26vh,260px)}
+  .tick-line p{font-size:.76rem;line-height:1.4}
+  .sig-close{font-size:.88rem}
+}
 
 /* ————— process ————— */
 .proc-track{display:grid;grid-template-columns:1fr;gap:1.1rem;margin-top:2.4rem}
@@ -383,8 +396,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
     <svg viewBox="0 0 560 340" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
       <rect x="24" y="70" width="380" height="200" rx="12"/>
       <circle cx="140" cy="170" r="66"/>
-      <circle cx="140" cy="170" r="9"/>
-      <path d="M146 116c30 12 40 40 30 64M100 216c-16-28-6-56 16-68M186 200c-12 28-44 36-66 26"/>
+      <g id="heroFan">
+        <circle cx="140" cy="170" r="9"/>
+        <path d="M146 116c30 12 40 40 30 64M100 216c-16-28-6-56 16-68M186 200c-12 28-44 36-66 26"/>
+      </g>
       <path d="M252 108h130M252 132h130M252 156h130M252 180h130M252 204h130M252 228h130"/>
       <path d="M64 270v20M364 270v20"/>
       <path d="M404 196h58c14 0 22 8 22 22v96"/>
@@ -535,24 +550,111 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
   </div>
 </section>
 
-<!-- ═══ 4 · SIGNATURE: THE PULL-DOWN ═══ -->
+<!-- ═══ 4 · SIGNATURE: THE CALLOUT, SCRUBBED ═══ -->
 <div class="sig-wrap">
   <section class="sig" aria-label="A real callout, hour by hour">
     <div class="sig-frost" aria-hidden="true"></div>
-    <div class="wrap sig-grid">
-      <div class="ticket">
-        <p class="ticket-head">Job №2214 · Pub kitchen, Helston · A Tuesday in August</p>
-        <div class="tick-line"><time>13:42</time><p>Landlord calls: walk-in freezer at +9°C and climbing, stock starting to soften. Call answered on the second ring.</p></div>
-        <div class="tick-line"><time>14:31</time><p>Engineer on site. Fault found in twenty minutes — condenser fan seized, head pressure through the roof.</p></div>
+    <div class="wrap sig-stack">
+      <p class="ticket-head">Job №2214 · The Ship Inn, Helston · A Tuesday in August — scroll runs the callout</p>
+      <div class="scene-frame">
+        <svg id="scene" viewBox="0 0 1200 420" preserveAspectRatio="xMinYMax slice" aria-hidden="true">
+          <!-- far layer: hills, gulls -->
+          <g id="worldFar" transform="translate(-744,0)" fill="none" stroke="#39647F" stroke-width="1.5" stroke-linecap="round">
+            <path d="M0 302 C120 262 240 282 360 270 C480 258 560 290 680 280 C800 270 920 242 1040 260 C1160 278 1240 262 1320 270 C1440 278 1560 252 1680 264 C1800 276 1900 264 2010 272"/>
+            <path d="M120 330 C260 306 420 318 560 310 C720 300 900 316 1060 306 C1240 296 1420 314 1600 306 C1740 302 1880 310 2010 304" opacity=".55"/>
+            <path d="M430 120 q9 -9 18 0 M452 122 q9 -9 18 0"/>
+            <path d="M1560 100 q9 -9 18 0 M1584 106 q8 -8 16 0" opacity=".8"/>
+          </g>
+          <!-- mid layer: tin mine, signpost, hedges, sea -->
+          <g id="worldMid" transform="translate(-1736,0)" fill="none" stroke="#4E86A6" stroke-width="1.8" stroke-linecap="round">
+            <rect x="1300" y="252" width="64" height="128" rx="2"/>
+            <path d="M1316 380 v-52 a16 16 0 0 1 32 0 v52"/>
+            <rect x="1372" y="206" width="16" height="174"/>
+            <path d="M1368 206 h24 M1296 252 h72"/>
+            <path d="M1500 380 v-78"/>
+            <rect x="1500" y="304" width="158" height="28" rx="3" fill="#0B2530"/>
+            <text class="scene-txt" x="1579" y="323" text-anchor="middle">A394 → HELSTON</text>
+            <path d="M1950 336 q30 -10 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0" opacity=".7"/>
+            <path d="M1990 352 q30 -10 60 0 t60 0 t60 0 t60 0 t60 0 t60 0" opacity=".5"/>
+            <path d="M2434 322 l14 -22 v22 M2420 322 h44 l-8 10 h-28 z"/>
+          </g>
+          <!-- main layer: HQ and the pub -->
+          <g id="worldMain" transform="translate(-2480,0)" fill="none" stroke="#7FC4EA" stroke-width="2" stroke-linecap="round">
+            <rect x="30" y="225" width="230" height="155" rx="4" fill="#0B2530"/>
+            <rect x="70" y="285" width="90" height="95"/>
+            <path d="M70 302 h90 M70 319 h90 M70 336 h90 M70 353 h90"/>
+            <rect x="185" y="290" width="50" height="40"/>
+            <rect x="60" y="238" width="170" height="30" rx="3" fill="#0B2530"/>
+            <text class="scene-txt" x="145" y="258" text-anchor="middle">ASR COOLING · UNIT 4</text>
+            <g id="ring" opacity="0" stroke="#E0793F">
+              <path d="M132 200 a18 18 0 0 1 26 0 M126 188 a26 26 0 0 1 38 0"/>
+            </g>
+            <g id="pub">
+              <rect x="2440" y="195" width="280" height="185" rx="3" fill="#0B2530"/>
+              <path d="M2430 195 h300"/>
+              <rect x="2466" y="170" width="20" height="25"/>
+              <rect x="2470" y="225" width="44" height="36"/>
+              <rect x="2558" y="225" width="44" height="36"/>
+              <rect x="2646" y="225" width="44" height="36"/>
+              <g id="pubWarm" opacity="0" stroke="none" fill="#C9622B">
+                <rect x="2470" y="225" width="44" height="36" opacity=".3"/>
+                <rect x="2558" y="225" width="44" height="36" opacity=".3"/>
+                <rect x="2646" y="225" width="44" height="36" opacity=".3"/>
+              </g>
+              <text class="scene-txt" x="2580" y="302" text-anchor="middle" letter-spacing=".25em">THE SHIP INN</text>
+              <rect x="2570" y="320" width="40" height="60"/>
+              <circle cx="2603" cy="352" r="2" fill="#7FC4EA" stroke="none"/>
+            </g>
+            <g id="cellar">
+              <path d="M2720 282 H3160 V380 H2720 Z" fill="#0B2530"/>
+              <path d="M2712 282 h456"/>
+              <rect x="3110" y="344" width="26" height="36" rx="3" fill="#0B2530"/>
+              <path d="M3110 354 h26 M3110 368 h26"/>
+            </g>
+            <g id="cooler">
+              <rect x="3030" y="318" width="58" height="48" rx="4" fill="#0B2530"/>
+              <circle cx="3059" cy="342" r="15"/>
+              <g id="pubFan">
+                <path d="M3059 329 v26 M3046 335.5 l26 13 M3046 348.5 l26 -13"/>
+              </g>
+              <path d="M3030 330 h-12 M3030 354 h-12"/>
+              <g id="alert" opacity="0" stroke="#C9622B">
+                <path d="M3059 282 l15 26 h-30 z"/>
+                <path d="M3059 291 v9 M3059 304 v.5"/>
+              </g>
+            </g>
+          </g>
+          <!-- road: static, dashes stream -->
+          <path d="M0 384 H1200" stroke="#54798D" stroke-width="2"/>
+          <path id="dashes" d="M0 371 H1200" stroke="#54798D" stroke-width="2" stroke-dasharray="26 34" fill="none"/>
+          <!-- the van -->
+          <g id="van" fill="none" stroke="#A8CFE6" stroke-width="2" stroke-linecap="round">
+            <rect x="268" y="268" width="134" height="88" rx="6" fill="#0C2836"/>
+            <rect x="282" y="254" width="44" height="14" rx="3" fill="#0C2836"/>
+            <path d="M402 288 h32 c10 0 16 5 20 13 l9 19 c3 6 4 11 4 17 v11 c0 5 -4 8 -9 8 h-56 z" fill="#0C2836"/>
+            <path d="M412 294 h18 l11 24 h-29 z"/>
+            <path d="M296 362 a20 20 0 0 1 40 0 M412 362 a20 20 0 0 1 40 0"/>
+            <g id="wheelA"><circle cx="316" cy="362" r="16"/><path d="M316 348 v28 M302 369 l28 -14 M302 355 l28 14"/></g>
+            <g id="wheelB"><circle cx="432" cy="362" r="16"/><path d="M432 348 v28 M418 369 l28 -14 M418 355 l28 14"/></g>
+            <path d="M268 334 H402" stroke="#C9622B"/>
+            <text class="scene-txt" x="335" y="316" text-anchor="middle">ASR COOLING</text>
+            <path d="M300 296 v14 M293 303 h14 M295 298 l10 10 M305 298 l-10 10" stroke-width="1.2"/>
+            <g id="lights" opacity="0" stroke="#E0793F"><path d="M469 328 h16 M469 338 h11"/></g>
+          </g>
+        </svg>
+      </div>
+      <div class="sig-strip">
+        <div class="tick-line"><time>13:42</time><p>Landlord calls: walk-in freezer at +9°C and climbing. Answered on the second ring, van rolling from Falmouth.</p></div>
+        <div class="tick-line"><time>14:31</time><p>On site in Helston. Fault found in twenty minutes — condenser fan seized, head pressure through the roof.</p></div>
         <div class="tick-line"><time>15:50</time><p>Fan motor swapped from van stock. System leak-tested, recharged, pull-down started.</p></div>
         <div class="tick-line"><time>17:15</time><p>−18°C. Stock checked, logbook updated, signed off before the evening service.</p></div>
-        <p class="sig-close">That's the whole pitch. If your readout's climbing, <a href="tel:+441326755432">call 01326 755432</a> before the stock's gone.</p>
+        <div class="sig-inst" aria-hidden="true">
+          <p class="sig-readout"><span id="sigTemp">−18.0</span><small>°C</small></p>
+          <span id="sigBar"></span>
+          <p class="sig-cap">Cabinet temperature</p>
+        </div>
       </div>
-      <div class="sig-side" aria-hidden="true">
-        <p class="sig-readout"><span id="sigTemp">−18.0</span><small>°C</small></p>
-        <span id="sigBar"></span>
-        <p class="sig-cap">Cabinet temperature · scroll = pull-down</p>
-      </div>
+      <p class="sig-close">That's the whole pitch. If your readout's climbing, <a href="tel:+441326755432">call 01326 755432</a> before the stock's gone.</p>
     </div>
   </section>
 </div>
@@ -768,6 +870,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
       .from(".hero-cta > *",{y:18,opacity:0,duration:0.45,stagger:0.08},"-=0.25")
       .from(".hero-cred",{opacity:0,duration:0.4},"-=0.15");
     gsap.to(".cue svg",{y:7,duration:0.9,repeat:-1,yoyo:true,ease:"sine.inOut"});
+    /* the condensing unit idles — one thing always quietly turning */
+    gsap.to("#heroFan",{rotation:360,svgOrigin:"140 170",duration:9,repeat:-1,ease:"none"});
 
     /* ── trust: counters + row reveal ── */
     $$(".stat[data-to]").forEach(function(el){
@@ -796,16 +900,47 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
         scrollTrigger:{trigger:".svc-grid",start:"top bottom",end:"bottom top",scrub:1.2}});
     });
 
-    /* ── signature section: the pull-down, scrubbed ── */
-    var lines=$$(".tick-line"),sigT=$("#sigTemp"),proxy={t:9};
+    /* ── signature section: the callout film, scrubbed ──
+       0–.08 the call comes in · .10–.60 the drive (world slides, wheels
+       spin, dashes stream) · .60–.80 on site, fan swapped · .80–1 pull-down */
+    var lines=$$(".tick-line"),sigT=$("#sigTemp"),proxy={t:9},
+        upd=function(){if(sigT)sigT.textContent=fmt(proxy.t)},
+        D=2480,drive={duration:0.5,ease:"power2.inOut"};
     gsap.set(lines,{opacity:0.25});
     gsap.set(".sig-frost",{opacity:0});
     var sig=gsap.timeline({defaults:{ease:"none"},
       scrollTrigger:{trigger:".sig-wrap",start:"top top",end:"bottom bottom",scrub:0.6}});
-    sig.to(proxy,{t:-18,duration:1,onUpdate:function(){if(sigT)sigT.textContent=fmt(proxy.t)}},0);
     sig.fromTo("#sigBar",{scaleX:0},{scaleX:1,duration:1},0);
-    lines.forEach(function(ln,i){sig.to(ln,{opacity:1,duration:0.07},0.06+i*0.23)});
-    sig.to(".sig-frost",{opacity:0.55,duration:0.28},0.72);
+    /* 13:42 — the phone rings at the unit */
+    sig.set("#alert",{opacity:1},0);
+    sig.set("#pubWarm",{opacity:1},0);
+    sig.to("#ring",{keyframes:[{opacity:1,duration:0.012},{opacity:0,duration:0.012},
+      {opacity:1,duration:0.012},{opacity:0,duration:0.012}]},0.012);
+    sig.to(lines[0],{opacity:1,duration:0.05},0.03);
+    sig.fromTo(proxy,{t:9},{t:9.4,duration:0.06,onUpdate:upd},0.005);
+    sig.to(proxy,{t:11.5,duration:0.5,onUpdate:upd},0.09);
+    /* the drive — van holds, Cornwall slides past at three depths */
+    sig.to("#lights",{opacity:1,duration:0.02},0.08);
+    sig.fromTo("#worldMain",{x:0},{x:-D,duration:drive.duration,ease:drive.ease},0.10);
+    sig.fromTo("#worldMid",{x:0},{x:-D*0.7,duration:drive.duration,ease:drive.ease},0.10);
+    sig.fromTo("#worldFar",{x:0},{x:-D*0.3,duration:drive.duration,ease:drive.ease},0.10);
+    sig.fromTo("#dashes",{strokeDashoffset:0},{strokeDashoffset:-D,duration:drive.duration,ease:drive.ease},0.10);
+    sig.to("#wheelA",{rotation:8880,svgOrigin:"316 362",duration:drive.duration,ease:drive.ease},0.10);
+    sig.to("#wheelB",{rotation:8880,svgOrigin:"432 362",duration:drive.duration,ease:drive.ease},0.10);
+    sig.to("#van",{keyframes:[{y:-2,duration:0.08},{y:1,duration:0.1},
+      {y:-1.5,duration:0.1},{y:0,duration:0.14}]},0.13);
+    /* 14:31 — on site */
+    sig.to(lines[1],{opacity:1,duration:0.05},0.58);
+    sig.to("#lights",{opacity:0,duration:0.02},0.60);
+    /* 15:50 — the fix: alert clears, fan spins back up, windows cool */
+    sig.to("#alert",{opacity:0,duration:0.04},0.70);
+    sig.to("#pubFan",{rotation:1440,svgOrigin:"3059 342",duration:0.22,ease:"power1.in"},0.68);
+    sig.to(lines[2],{opacity:1,duration:0.05},0.70);
+    sig.to("#pubWarm",{opacity:0,duration:0.1},0.78);
+    /* 17:15 — pull-down to −18, frost closes in */
+    sig.to(proxy,{t:-18,duration:0.18,onUpdate:upd},0.80);
+    sig.to(".sig-frost",{opacity:0.55,duration:0.12},0.86);
+    sig.to(lines[3],{opacity:1,duration:0.05},0.92);
 
     /* ── process: horizontal scrub on desktop, vertical stagger on mobile ── */
     var proc=$(".proc");
