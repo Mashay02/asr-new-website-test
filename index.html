@@ -191,10 +191,13 @@ section{padding:clamp(4rem,9vh,7rem) 0}
   line-height:1;color:var(--copper);display:block}
 .trust-item p{margin-top:.45rem;font-size:.92rem;color:var(--steel)}
 .trust-item p strong{color:var(--frost)}
-.cred-row{margin-top:1.6rem;display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;
+.cred-wrap{overflow:hidden;margin-top:1.6rem}
+.cred-row{display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;
   font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
   color:var(--steel)}
 .cred-row span::before{content:"▪";color:var(--coil);margin-right:.55rem;font-size:.6rem;vertical-align:1px}
+.cred-row.marquee{flex-wrap:nowrap;gap:0;width:max-content;will-change:transform}
+.cred-row.marquee span{white-space:nowrap;margin-right:2.2rem}
 @media (max-width:899.98px){.trust-grid{grid-template-columns:1fr 1fr}}
 @media (max-width:479.98px){.trust-grid{grid-template-columns:1fr}}
 
@@ -266,6 +269,9 @@ section{padding:clamp(4rem,9vh,7rem) 0}
 .proc-step h3{font-family:var(--disp);font-weight:700;font-size:1.6rem;margin-bottom:.4rem}
 .proc-step p{font-size:.95rem;color:var(--steel)}
 .proc-step p strong{color:var(--frost)}
+#procBar{display:block;height:3px;border-radius:2px;margin-top:1.5rem;max-width:100%;
+  background:linear-gradient(90deg,var(--copper),var(--coil-lt));
+  transform-origin:0 50%;will-change:transform}
 @media (min-width:600px){.proc-track{grid-template-columns:1fr 1fr}}
 /* horizontal mode — applied by JS on desktop only */
 .proc.h{display:flex;flex-direction:column;justify-content:center;min-height:100vh;overflow:hidden}
@@ -273,6 +279,10 @@ section{padding:clamp(4rem,9vh,7rem) 0}
 .proc.h .proc-step{width:min(400px,38vw);flex:none}
 
 /* ————— proof ————— */
+.proof{position:relative;overflow:hidden}
+.proof .wrap{position:relative}
+.proof-mark{position:absolute;right:-6%;top:4%;width:min(46vw,520px);height:auto;
+  color:var(--coil);opacity:.05;pointer-events:none;will-change:transform}
 .proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
   gap:1.1rem;margin-top:2.4rem}
 .quote{will-change:transform}
@@ -290,6 +300,9 @@ section{padding:clamp(4rem,9vh,7rem) 0}
 .map-svg{width:100%;height:auto;display:block}
 #coast{stroke:var(--coil);stroke-width:1.6;fill:rgba(47,134,196,.06)}
 .tamar{stroke:var(--steel);stroke-width:1;stroke-dasharray:3 5;opacity:.5}
+#mapRoute{stroke:var(--steel);stroke-width:1.2;stroke-dasharray:3 5;opacity:.4}
+#mapVan rect{fill:var(--copper)}
+#mapVan circle{fill:var(--ink)}
 .pin circle{fill:var(--coil-lt)}
 .pin.hq circle{fill:var(--copper)}
 .pin text{font-family:var(--mono);font-size:10.5px;fill:var(--frost);letter-spacing:.04em}
@@ -298,12 +311,24 @@ section{padding:clamp(4rem,9vh,7rem) 0}
 .map-note strong{color:var(--frost)}
 
 /* ————— compliance ————— */
-.comp-in{border:1px solid var(--line);border-left:3px solid var(--coil);border-radius:14px;
+.comp-in{position:relative;border:1px solid var(--line);border-left:3px solid var(--coil);border-radius:14px;
   background:var(--panel);padding:1.8rem clamp(1.3rem,3vw,2.4rem);max-width:860px}
+.comp-seal{position:absolute;top:1.5rem;right:1.5rem;width:58px;height:58px;
+  color:var(--coil-lt);opacity:.65}
+@media (max-width:599.98px){.comp-seal{width:40px;height:40px;top:1rem;right:1rem}}
 .comp-in p{color:var(--steel);margin-top:.4rem}
 .comp-in p strong{color:var(--frost)}
 
 /* ————— contact ————— */
+.contact{position:relative;overflow:hidden}
+.contact .wrap{position:relative}
+.flakes{position:absolute;inset:0;pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent)}
+.flakes i{position:absolute;top:-26px;font-style:normal;line-height:1;
+  color:rgba(127,196,234,.3);will-change:transform}
+.led{display:inline-block;width:9px;height:9px;border-radius:50%;
+  background:var(--copper);margin-right:.5rem;vertical-align:1px}
 .contact-grid{display:grid;grid-template-columns:1fr;gap:1.4rem;margin-top:2.4rem}
 @media (min-width:900px){.contact-grid{grid-template-columns:1.1fr .9fr}}
 .contact-col{background:var(--panel);border:1px solid var(--line);border-radius:14px;
@@ -404,11 +429,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
       <path d="M64 270v20M364 270v20"/>
       <path d="M404 196h58c14 0 22 8 22 22v96"/>
       <path d="M404 236h38c10 0 16 6 16 16v62" stroke-dasharray="1 7"/>
-      <circle cx="484" cy="252" r="2.4" fill="currentColor" stroke="none"/>
-      <circle cx="484" cy="276" r="2" fill="currentColor" stroke="none"/>
-      <circle cx="459" cy="290" r="1.8" fill="currentColor" stroke="none"/>
+      <circle class="bead" cx="484" cy="252" r="2.4" fill="currentColor" stroke="none"/>
+      <circle class="bead" cx="484" cy="276" r="2" fill="currentColor" stroke="none"/>
+      <circle class="bead" cx="459" cy="290" r="1.8" fill="currentColor" stroke="none"/>
       <circle cx="472" cy="120" r="26"/>
-      <path d="M472 120l12-14M472 104v-8M451 130l-8 4M493 130l8 4"/>
+      <path id="heroNeedle" d="M472 120l12-14"/>
+      <path d="M472 104v-8M451 130l-8 4M493 130l8 4"/>
       <path d="M472 146c0 22-10 28-10 50"/>
     </svg>
   </div>
@@ -451,12 +477,16 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
           <p><strong>Most repairs finished first time</strong> — vans carry fans, controls, gas and common parts.</p>
         </div>
       </div>
-      <p class="cred-row">
-        <span>F-Gas certified engineers</span>
-        <span>REFCOM registered</span>
-        <span>Fully insured</span>
-        <span>Trained by Daikin · Mitsubishi Electric · Hoshizaki</span>
-      </p>
+      <div class="cred-wrap">
+        <p class="cred-row">
+          <span>F-Gas certified engineers</span>
+          <span>REFCOM registered</span>
+          <span>Fully insured</span>
+          <span>Trained by Daikin · Mitsubishi Electric · Hoshizaki</span>
+          <span>Same-day emergency callout</span>
+          <span>Cornwall &amp; West Devon</span>
+        </p>
+      </div>
     </div>
   </section>
 </div>
@@ -472,8 +502,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
       <article class="svc"><div class="svc-in">
         <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
           <rect x="4" y="10" width="40" height="26" rx="3"/>
-          <circle cx="16" cy="23" r="8"/><circle cx="16" cy="23" r="1.6"/>
-          <path d="M17 15.5c3.5 1.5 4.6 5 3.4 7.8M11 29c-2-3.4-.6-6.8 2-8.2"/>
+          <circle cx="16" cy="23" r="8"/>
+          <g class="icon-fan"><circle cx="16" cy="23" r="1.6"/>
+          <path d="M17 15.5c3.5 1.5 4.6 5 3.4 7.8M11 29c-2-3.4-.6-6.8 2-8.2"/></g>
           <path d="M29 16h10M29 20.5h10M29 25h10M29 29.5h10M10 36v3M38 36v3"/>
         </svg>
         <h3>Refrigeration repair &amp; install</h3>
@@ -486,7 +517,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
           <rect x="8" y="8" width="32" height="32" rx="2"/>
           <rect x="17" y="17" width="14" height="14" rx="1"/>
           <path d="M12 12.5h6M30 12.5h6M12 35.5h6M30 35.5h6" transform="rotate(0)"/>
-          <path d="M13 44l-3 3M35 44l3 3M24 44v4" stroke-dasharray="1 3"/>
+          <g class="icon-air"><path d="M13 44l-3 3M35 44l3 3M24 44v4" stroke-dasharray="1 3"/></g>
         </svg>
         <h3>Air conditioning</h3>
         <p>Splits, multi-splits and ceiling cassettes for dining rooms, kitchens and offices. Heat-load calculated and sized properly — not guessed. Daikin and Mitsubishi Electric trained.</p>
@@ -497,7 +528,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
         <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
           <rect x="6" y="6" width="36" height="15" rx="2"/>
           <path d="M10 10.5h28M10 14h28M10 17.5h28"/>
-          <path d="M14 26c0 2 0 3 1 4M24 26c0 3 0 4 0 6M34 26c0 2 0 3-1 4" stroke-dasharray="1 3"/>
+          <path class="icon-dash" d="M14 26c0 2 0 3 1 4M24 26c0 3 0 4 0 6M34 26c0 2 0 3-1 4" stroke-dasharray="1 3"/>
           <rect x="17" y="32" width="14" height="12" rx="4"/>
           <path d="M17 36.5h14M17 40h14"/>
         </svg>
@@ -511,9 +542,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
           <rect x="10" y="5" width="28" height="38" rx="3"/>
           <path d="M10 19h28"/>
           <path d="M33 11.5h.01M29 11.5h.01"/>
-          <rect x="17" y="25" width="6" height="6" rx="1"/>
-          <rect x="26" y="30" width="6" height="6" rx="1"/>
-          <rect x="19" y="34" width="6" height="6" rx="1" transform="rotate(8 22 37)"/>
+          <rect class="icon-cube" x="17" y="25" width="6" height="6" rx="1"/>
+          <rect class="icon-cube" x="26" y="30" width="6" height="6" rx="1"/>
+          <rect class="icon-cube" x="19" y="34" width="6" height="6" rx="1" transform="rotate(8 22 37)"/>
         </svg>
         <h3>Ice machines</h3>
         <p>Hoshizaki-trained supply, service and descale. Clean water paths, full bins, no grey build-up — and no borrowed bags of ice from the shop next door.</p>
@@ -525,7 +556,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
           <rect x="12" y="4" width="24" height="40" rx="2"/>
           <path d="M12 10h-3M12 38h-3"/>
           <rect x="30" y="21" width="3" height="7" rx="1.5"/>
-          <path d="M17 4v40" stroke-dasharray="2 4"/>
+          <path class="icon-dash" d="M17 4v40" stroke-dasharray="2 4"/>
           <path d="M40 12v6M40 15h4M42 26h2M40 30h4" stroke-width="1.2"/>
         </svg>
         <h3>Cold rooms &amp; cabinets</h3>
@@ -536,7 +567,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
       <article class="svc"><div class="svc-in">
         <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
           <circle cx="15" cy="14" r="8"/><circle cx="33" cy="14" r="8"/>
-          <path d="M15 14l4-4M33 14l-2-5"/>
+          <path class="icon-needle" data-o="15 14" d="M15 14l4-4"/>
+          <path class="icon-needle" data-o="33 14" d="M33 14l-2-5"/>
           <path d="M15 22c0 8-3 10-3 18M33 22c0 8 3 10 3 18"/>
           <path d="M21 14h6"/>
           <path d="M25 32h14v10H25zM28 36h8M28 39h5" stroke-width="1.3"/>
@@ -664,6 +696,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
   <div class="wrap">
     <p class="label">How it works</p>
     <h2>Four steps between a warm fridge and a cold one</h2>
+    <span id="procBar" aria-hidden="true"></span>
     <div class="proc-track">
       <article class="proc-step">
         <b class="num" aria-hidden="true">01</b>
@@ -690,7 +723,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
 </section>
 
 <!-- ═══ 6 · PROOF ═══ -->
-<section aria-label="What customers say">
+<section class="proof" aria-label="What customers say">
+  <svg class="proof-mark" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 2v20M3.3 7l17.4 10M20.7 7L3.3 17" fill="none" stroke="currentColor" stroke-width=".8"/>
+  </svg>
   <div class="wrap">
     <p class="label">On the record</p>
     <h2>Three calls that went the way calls should</h2>
@@ -730,6 +766,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
           C 198 346 178 340 168 326 C 158 314 150 304 134 300
           C 116 296 98 306 84 310 C 64 314 40 296 28 272 Z"/>
         <path class="tamar" d="M414 58 C 430 110 450 180 492 238"/>
+        <path id="mapRoute" fill="none" d="M244 278 C 252 260 248 250 254 246 C 280 238 306 236 322 230 C 330 214 316 196 320 186 C 344 196 366 208 388 212 C 424 200 468 182 496 172 C 500 192 492 216 486 234"/>
+        <g id="mapVan" transform="translate(244,278)">
+          <rect x="-7" y="-6" width="14" height="8" rx="2"/>
+          <circle cx="-3.5" cy="4" r="1.8"/><circle cx="3.5" cy="4" r="1.8"/>
+        </g>
         <text class="map-region" x="150" y="120">CORNWALL</text>
         <text class="map-region" x="536" y="44" text-anchor="end">WEST DEVON</text>
         <g class="pin"><circle cx="108" cy="298" r="4"/><text x="100" y="320" text-anchor="middle">Penzance</text></g>
@@ -755,6 +796,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
 <section class="comp" aria-label="F-Gas and REFCOM compliance, explained">
   <div class="wrap">
     <div class="comp-in">
+      <svg class="comp-seal" viewBox="0 0 64 64" aria-hidden="true">
+        <circle id="sealRing" cx="32" cy="32" r="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 6"/>
+        <path d="M32 18v28M20 25l24 14M44 25L20 39" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
       <p class="label">The paperwork, in plain English</p>
       <h2>What F-Gas and REFCOM actually mean for you</h2>
       <p>Nearly all commercial cooling kit holds F-Gas refrigerant. The law says it must be leak-checked at set intervals, by certified engineers, with records kept — and an EHO visit or an insurance claim is exactly when that folder gets asked for. <strong>REFCOM is the register that audits cooling companies to prove they handle refrigerant legally.</strong></p>
@@ -764,7 +809,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
 </section>
 
 <!-- ═══ 9 · CONTACT ═══ -->
-<section id="contact" aria-label="Contact ASR Cooling">
+<section id="contact" class="contact" aria-label="Contact ASR Cooling">
+  <div class="flakes" aria-hidden="true">
+    <i style="left:6%;font-size:11px">✳</i>
+    <i style="left:18%;font-size:15px">✳</i>
+    <i style="left:31%;font-size:10px">✳</i>
+    <i style="left:44%;font-size:13px">✳</i>
+    <i style="left:58%;font-size:11px">✳</i>
+    <i style="left:70%;font-size:16px">✳</i>
+    <i style="left:83%;font-size:10px">✳</i>
+    <i style="left:93%;font-size:13px">✳</i>
+  </div>
   <div class="wrap">
     <p class="label">Get it fixed</p>
     <h2>Warm fridge? Dead cellar? Hot kitchen?</h2>
@@ -773,7 +828,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
         <a class="big-tel" href="tel:+441326755432">01326 755432</a>
         <p class="lede" style="margin-top:.4rem">Mon–Fri, 8:00–17:30 — an engineer answers.</p>
         <div class="emg">
-          <strong>Out of hours emergency:</strong> <a href="tel:+447495639294">07495 639294</a> rings an engineer's mobile, not an answering service. Weekend cellar and walk-in callouts covered.
+          <i class="led" aria-hidden="true"></i><strong>Out of hours emergency:</strong> <a href="tel:+447495639294">07495 639294</a> rings an engineer's mobile, not an answering service. Weekend cellar and walk-in callouts covered.
         </div>
         <address>
           ASR Cooling Ltd<br>
@@ -815,6 +870,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomEase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MotionPathPlugin.min.js"></script>
 <script>
 (function(){
   var root=document.documentElement;
@@ -822,6 +878,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
   if(!window.gsap||!window.ScrollTrigger)return;
 
   gsap.registerPlugin(ScrollTrigger,CustomEase);
+  if(window.MotionPathPlugin)gsap.registerPlugin(MotionPathPlugin);
   ScrollTrigger.config({ignoreMobileResize:true});
   /* eases with weight: "settle" = equipment coming to rest, "mech" = valve action */
   CustomEase.create("settle","0.18,0.72,0.16,1");
@@ -900,6 +957,45 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
         scrollTrigger:{trigger:".svc-grid",start:"top bottom",end:"bottom top",scrub:1.2}});
     });
 
+    /* ── ambient: every section idles like plant equipment ── */
+    /* hero: condensation drips, gauge needle flickers */
+    gsap.fromTo(".bead",{y:0,opacity:0.9},{y:14,opacity:0,duration:1.9,
+      ease:"power1.in",stagger:0.65,repeat:-1,repeatDelay:0.8});
+    gsap.to("#heroNeedle",{rotation:9,svgOrigin:"472 120",duration:1.6,
+      yoyo:true,repeat:-1,ease:"sine.inOut"});
+    /* services: the kit runs */
+    gsap.to(".icon-fan",{rotation:360,svgOrigin:"16 23",duration:7,repeat:-1,ease:"none"});
+    gsap.to(".icon-air",{y:3,opacity:0.35,duration:1.1,yoyo:true,repeat:-1,ease:"sine.inOut"});
+    gsap.to(".icon-dash",{strokeDashoffset:-12,duration:2.4,repeat:-1,ease:"none"});
+    gsap.to(".icon-cube",{y:1.8,duration:1.3,yoyo:true,repeat:-1,ease:"sine.inOut",stagger:0.35});
+    $$(".icon-needle").forEach(function(n,i){
+      gsap.to(n,{rotation:i?14:-11,svgOrigin:n.getAttribute("data-o"),
+        duration:1.5+i*0.4,yoyo:true,repeat:-1,ease:"sine.inOut"});
+    });
+    /* proof: slow-turning frost watermark */
+    gsap.to(".proof-mark",{rotation:360,duration:90,repeat:-1,ease:"none"});
+    /* compliance: the seal turns */
+    gsap.to("#sealRing",{rotation:360,svgOrigin:"32 32",duration:36,repeat:-1,ease:"none"});
+    /* contact: line-open LED, frost falls at −18 */
+    gsap.to(".led",{opacity:0.25,duration:0.85,yoyo:true,repeat:-1,ease:"sine.inOut"});
+    $$(".flakes i").forEach(function(f,i){
+      gsap.to(f,{y:function(){var s=$(".contact");return (s?s.offsetHeight:600)+80},
+        duration:11+i*2.1,repeat:-1,ease:"none",delay:i*-2.7});
+      gsap.to(f,{x:(i%2?14:-12),duration:2.4+i*0.3,yoyo:true,repeat:-1,ease:"sine.inOut"});
+    });
+    /* trust: credentials ticker */
+    var row=$(".cred-row");
+    if(row&&!row.dataset.mq){
+      row.dataset.mq="1";row.dataset.orig=row.innerHTML;
+      row.innerHTML+=row.innerHTML;row.classList.add("marquee");
+      gsap.to(row,{xPercent:-50,duration:34,repeat:-1,ease:"none"});
+    }
+    /* coverage: the van does the rounds */
+    if(window.MotionPathPlugin){
+      gsap.to("#mapVan",{motionPath:{path:"#mapRoute",align:"#mapRoute",
+        alignOrigin:[0.5,0.5],autoRotate:true},duration:22,repeat:-1,yoyo:true,ease:"none"});
+    }
+
     /* ── signature section: the callout film, scrubbed ──
        0–.08 the call comes in · .10–.60 the drive (world slides, wheels
        spin, dashes stream) · .60–.80 on site, fan swapped · .80–1 pull-down */
@@ -948,14 +1044,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
       proc.classList.add("h");
       var track=$(".proc-track");
       var dist=function(){return Math.max(0,track.scrollWidth-proc.clientWidth+120)};
-      gsap.to(track,{x:function(){return -dist()},ease:"none",
-        scrollTrigger:{trigger:proc,start:"top top",end:function(){return "+="+(dist()+vh()*0.25)},
-          pin:true,scrub:1,invalidateOnRefresh:true}});
+      var ht=gsap.timeline({scrollTrigger:{trigger:proc,start:"top top",
+        end:function(){return "+="+(dist()+vh()*0.25)},pin:true,scrub:1,invalidateOnRefresh:true}});
+      ht.to(track,{x:function(){return -dist()},ease:"none"},0);
+      ht.fromTo("#procBar",{scaleX:0},{scaleX:1,ease:"none"},0);
       gsap.from($$(".proc-step"),{y:30,opacity:0,duration:0.5,ease:"settle",stagger:0.1,
         scrollTrigger:{trigger:proc,start:"top 70%",toggleActions:"play none none reverse"}});
     }else{
       gsap.from($$(".proc-step"),{y:34*k,opacity:0,duration:0.55,ease:"settle",stagger:0.1,
         scrollTrigger:{trigger:".proc-track",start:"top 85%",toggleActions:"play none none reverse"}});
+      gsap.fromTo("#procBar",{scaleX:0},{scaleX:1,ease:"none",
+        scrollTrigger:{trigger:".proc-track",start:"top 85%",end:"bottom 35%",scrub:1}});
     }
 
     /* ── proof: reveal + slight parallax offset from container ── */
@@ -983,7 +1082,14 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
     gsap.from($$(".contact-col"),{y:34*k,opacity:0,duration:0.6,ease:"settle",stagger:0.12,
       scrollTrigger:{trigger:".contact-grid",start:"top 85%",toggleActions:"play none none reverse"}});
 
-    return function(){if(proc)proc.classList.remove("h")};
+    return function(){
+      if(proc)proc.classList.remove("h");
+      if(row&&row.dataset.mq){
+        row.classList.remove("marquee");
+        row.innerHTML=row.dataset.orig;
+        delete row.dataset.mq;
+      }
+    };
   });
 
   /* refresh once real fonts are in, so start positions are measured correctly */
