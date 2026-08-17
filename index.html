@@ -1,27 +1,873 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASR Website</title>
-    <link rel="stylesheet" href="/style.css" />
-  </head>
-  <body>
-    <canvas id="scene"></canvas>
-    <main>
-      <section class="panel">
-        <h1>Section One</h1>
-        <p>Scroll down to see GSAP ScrollTrigger drive the Three.js scene.</p>
-      </section>
-      <section class="panel">
-        <h1>Section Two</h1>
-        <p>The cube rotates as you scroll through this section.</p>
-      </section>
-      <section class="panel">
-        <h1>Section Three</h1>
-        <p>Replace this demo with your own content and animations.</p>
-      </section>
-    </main>
-    <script type="module" src="/main.js"></script>
-  </body>
+<!--
+  ASR COOLING LTD — single-file site
+  ══════════════════════════════════════════════════════════════════
+  TOKEN SYSTEM
+  Colour   ink #0A1E28 · petrol #123540 · coil blue #2F86C4→#7FC4EA (brand
+           gradient, earned uses only) · frost #E9F3F7 · steel #8AA3B2 ·
+           brazed copper #C9622B (actions + hot numbers only)
+  Type     Big Shoulders Display 700/800 (display) · Archivo 400/500/600
+           (body) · IBM Plex Mono 400/500 (instrument readouts, labels)
+  Layout   Cold-room job sheet: flush petrol panels down one column,
+           mono gauge labels per section, environment cools around it.
+  Signature Temperature-gradient scroll +32°C → −18°C with fixed
+           thermometer rail; the scroll journey is the pull-down.
+  Motion   GSAP 3 + ScrollTrigger only. transform/opacity, scrub ≤1.2,
+           custom eases "settle" & "mech", reduced-motion = no triggers.
+  ══════════════════════════════════════════════════════════════════
+-->
+<html lang="en-GB" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASR Cooling — Commercial refrigeration, air con &amp; cellar cooling · Cornwall &amp; West Devon</title>
+<meta name="description" content="Commercial refrigeration, air conditioning, cellar cooling and ice machine repair across Cornwall and West Devon. F-Gas certified, REFCOM registered. Same-day emergency callout — 01326 755432.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ASR Cooling — warm fridge, dead cellar or hot kitchen? Call 01326 755432">
+<meta property="og:description" content="Commercial refrigeration, air conditioning and cellar cooling engineers covering Cornwall and West Devon. F-Gas certified, REFCOM registered, same-day emergency callout.">
+<meta property="og:locale" content="en_GB">
+<meta name="theme-color" content="#0A1E28">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HVACBusiness",
+  "name": "ASR Cooling Ltd",
+  "description": "Commercial refrigeration, air conditioning, cellar cooling, ice machines, cold rooms and planned maintenance across Cornwall and West Devon. F-Gas certified engineers, REFCOM registered.",
+  "telephone": "+441326755432",
+  "email": "Ryan@ASRcooling.com",
+  "address": { "@type": "PostalAddress", "addressLocality": "Falmouth", "addressRegion": "Cornwall", "addressCountry": "GB" },
+  "areaServed": [ "Cornwall", "West Devon" ],
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+    "opens": "08:00", "closes": "17:30"
+  }],
+  "contactPoint": [
+    { "@type": "ContactPoint", "telephone": "+441326755432", "contactType": "customer service", "areaServed": "GB" },
+    { "@type": "ContactPoint", "telephone": "+447495639294", "contactType": "emergency", "areaServed": "GB" }
+  ]
+}
+</script>
+<style>
+/* ————— tokens ————— */
+:root{
+  --ink:#0A1E28; --petrol:#123540; --coil:#2F86C4; --coil-lt:#7FC4EA;
+  --frost:#E9F3F7; --steel:#8AA3B2; --copper:#C9622B;
+  --panel:rgba(13,38,49,.72); --line:rgba(233,243,247,.09);
+  --disp:"Big Shoulders Display","Archivo",system-ui,sans-serif;
+  --body:"Archivo",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --wrap:1240px;
+}
+*{margin:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  font-family:var(--body);font-size:1.04rem;line-height:1.65;
+  color:var(--frost);background:var(--ink);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+::selection{background:var(--copper);color:var(--ink)}
+
+/* ————— environment (fixed temperature layers) ————— */
+.env{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.env-base{position:absolute;inset:0;
+  background:linear-gradient(180deg,#0E2833 0%,#0C2430 55%,#0A1E28 100%)}
+#envWarm{position:absolute;inset:0;opacity:0;will-change:opacity;
+  background:
+    radial-gradient(120% 80% at 78% 6%,rgba(201,98,43,.34) 0%,rgba(201,98,43,0) 55%),
+    radial-gradient(90% 70% at 15% 30%,rgba(224,121,63,.14) 0%,rgba(224,121,63,0) 60%),
+    linear-gradient(180deg,#2A150B 0%,#20232B 70%,#0E2833 100%)}
+@media (prefers-reduced-motion:no-preference){.js #envWarm{opacity:1}}
+#envDeep{position:absolute;inset:0;opacity:0;will-change:opacity;
+  background:
+    radial-gradient(110% 70% at 50% 110%,rgba(127,196,234,.16) 0%,rgba(127,196,234,0) 60%),
+    linear-gradient(180deg,rgba(4,12,17,0) 0%,#050E14 90%)}
+
+/* ————— thermometer rail (signature) ————— */
+.rail{position:fixed;top:0;right:0;bottom:0;width:64px;z-index:40;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:84px 0 26px;pointer-events:none}
+.rail-readout{font-family:var(--mono);font-size:.82rem;font-weight:500;
+  color:var(--frost);letter-spacing:.02em;text-align:center;line-height:1.2}
+.rail-readout em{display:block;font-style:normal;font-size:.62rem;color:var(--steel)}
+.rail-track{position:relative;flex:1;width:5px;border-radius:3px;
+  background:rgba(233,243,247,.10)}
+#railMerc{position:absolute;inset:0;border-radius:3px;will-change:transform;
+  background:linear-gradient(to top,var(--coil) 0%,var(--coil-lt) 55%,var(--copper) 100%);
+  transform-origin:50% 100%}
+.rail-track i{position:absolute;right:11px;transform:translateY(-50%);
+  font-family:var(--mono);font-style:normal;font-size:.56rem;color:var(--steel);
+  white-space:nowrap;letter-spacing:.05em}
+.chip{position:fixed;right:12px;bottom:12px;z-index:40;pointer-events:none;
+  font-family:var(--mono);font-size:.72rem;font-weight:500;color:var(--frost);
+  background:rgba(10,30,40,.8);border:1px solid var(--line);border-radius:99px;
+  padding:.35rem .7rem}
+.no-js .rail,.no-js .chip{display:none}
+@media (min-width:900px){.chip{display:none}}
+@media (max-width:899.98px){.rail{display:none}}
+
+/* ————— skip link + focus ————— */
+.skip{position:absolute;left:1rem;top:-3.5rem;z-index:100;
+  background:var(--copper);color:var(--ink);font-weight:600;
+  padding:.6rem 1rem;border-radius:6px;transition:top .15s}
+.skip:focus{top:1rem}
+:focus-visible{outline:2px solid var(--copper);outline-offset:3px;border-radius:2px}
+
+/* ————— nav ————— */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;gap:1.5rem;
+  padding:.8rem clamp(1rem,4vw,2.5rem);
+  background:linear-gradient(180deg,rgba(8,20,27,.88),rgba(8,20,27,.55) 75%,rgba(8,20,27,0))}
+.brand{display:flex;align-items:center;gap:.55rem;text-decoration:none}
+.brand svg{width:26px;height:26px;flex:none}
+.brand b{font-family:var(--disp);font-weight:800;font-size:1.35rem;letter-spacing:.03em;
+  background:linear-gradient(100deg,var(--coil-lt),var(--coil));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-links{display:flex;gap:1.4rem;margin-left:auto;list-style:none;padding:0}
+.nav-links a{color:var(--frost);text-decoration:none;font-size:.92rem;font-weight:500;opacity:.85}
+@media (hover:hover){.nav-links a:hover{opacity:1;color:var(--coil-lt)}}
+.nav-call{margin-left:auto;font-family:var(--mono);font-weight:500;font-size:.88rem;
+  color:var(--ink);background:var(--copper);text-decoration:none;
+  padding:.5rem .95rem;border-radius:6px;white-space:nowrap}
+.nav-links + .nav-call{margin-left:0}
+@media (hover:hover){.nav-call:hover{background:#D9743C}}
+@media (max-width:719.98px){.nav-links{display:none}}
+
+/* ————— shared section chrome ————— */
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(1.1rem,4.5vw,3rem)}
+@media (min-width:900px){.wrap{padding-right:clamp(3rem,6vw,5rem)}}
+.label{font-family:var(--mono);font-size:.78rem;font-weight:500;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--coil-lt);display:flex;align-items:center;gap:.7rem}
+.label::before{content:"";width:26px;height:1px;background:var(--coil);flex:none}
+h2{font-family:var(--disp);font-weight:700;font-size:clamp(2rem,4.5vw,3.4rem);
+  line-height:1.04;letter-spacing:.01em;margin:.7rem 0 1rem}
+.lede{color:var(--steel);max-width:56ch}
+section{padding:clamp(4rem,9vh,7rem) 0}
+
+/* ————— hero ————— */
+.hero{position:relative;min-height:100svh;overflow:hidden;
+  display:flex;align-items:flex-end;padding:5.5rem 0 clamp(3rem,8vh,5.5rem)}
+.hero-bg{position:absolute;left:0;right:0;top:-45%;bottom:-8%;will-change:transform;
+  background:
+    repeating-linear-gradient(90deg,rgba(233,243,247,.05) 0 1px,transparent 1px 10px);
+  mask-image:linear-gradient(180deg,transparent 0%,#000 25%,#000 80%,transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 25%,#000 80%,transparent 100%)}
+.hero-mid{position:absolute;right:-4%;top:2%;width:min(60vw,780px);opacity:.5;
+  color:var(--coil-lt);will-change:transform}
+.hero-mid svg{width:100%;height:auto;display:block}
+.hero-fg{position:relative;z-index:2;will-change:transform;width:100%}
+.hero-kicker{font-family:var(--mono);font-size:.8rem;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--coil-lt);margin-bottom:1.1rem}
+.hero h1{font-family:var(--disp);font-weight:800;line-height:.98;letter-spacing:.005em;
+  font-size:clamp(2.6rem,8vw,6.4rem);max-width:14ch}
+.hero h1 mark{background:none;color:var(--copper)}
+.hero-sub{margin:1.3rem 0 1.8rem;max-width:52ch;color:var(--steel);font-size:1.06rem}
+.hero-sub strong{color:var(--frost);font-weight:600}
+.hero-cta{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center}
+.btn{display:inline-block;text-decoration:none;font-weight:600;font-size:1.05rem;
+  padding:.95rem 1.5rem;border-radius:8px;line-height:1.2}
+.btn-hot{background:var(--copper);color:var(--ink);font-size:1.15rem;font-weight:700}
+@media (hover:hover){.btn-hot:hover{background:#D9743C}}
+.btn-ghost{border:1px solid rgba(233,243,247,.28);color:var(--frost)}
+@media (hover:hover){.btn-ghost:hover{border-color:var(--coil-lt);color:var(--coil-lt)}}
+.hero-cred{margin-top:1.5rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--steel)}
+.cue{position:absolute;left:50%;bottom:1.1rem;transform:translateX(-50%);z-index:2;
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--steel);display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.cue svg{width:14px;height:14px;stroke:var(--coil-lt)}
+
+/* ————— trust (sticky) ————— */
+.trust-wrap{height:135vh}
+.trust{position:sticky;top:0;min-height:100svh;display:flex;align-items:center}
+.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:2.2rem}
+.trust-item{background:var(--panel);padding:1.6rem 1.4rem}
+.stat{font-family:var(--disp);font-weight:800;font-size:clamp(2.4rem,4.5vw,3.6rem);
+  line-height:1;color:var(--copper);display:block}
+.trust-item p{margin-top:.45rem;font-size:.92rem;color:var(--steel)}
+.trust-item p strong{color:var(--frost)}
+.cred-row{margin-top:1.6rem;display:flex;flex-wrap:wrap;gap:.6rem 1.6rem;
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--steel)}
+.cred-row span::before{content:"▪";color:var(--coil);margin-right:.55rem;font-size:.6rem;vertical-align:1px}
+@media (max-width:899.98px){.trust-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:479.98px){.trust-grid{grid-template-columns:1fr}}
+
+/* ————— services ————— */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));
+  gap:1.1rem;margin-top:2.4rem}
+.svc{will-change:transform}
+.svc-in{height:100%;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:1.5rem 1.4rem 1.4rem;display:flex;flex-direction:column;gap:.65rem}
+@media (hover:hover){.svc-in{transition:border-color .2s}.svc:hover .svc-in{border-color:rgba(127,196,234,.4)}}
+.svc-icon{width:52px;height:52px;color:var(--coil-lt)}
+.svc h3{font-family:var(--disp);font-weight:700;font-size:1.55rem;letter-spacing:.02em}
+.svc p{font-size:.95rem;color:var(--steel);flex:1}
+.svc-tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;color:var(--coil-lt);
+  text-transform:uppercase}
+
+/* ————— signature: the pull-down ————— */
+.sig-wrap{height:220vh}
+.sig{position:sticky;top:0;min-height:100svh;display:flex;align-items:center;overflow:hidden}
+.sig-frost{position:absolute;inset:-6%;opacity:.35;pointer-events:none;will-change:transform,opacity;
+  background:
+    radial-gradient(60% 55% at 0% 100%,rgba(127,196,234,.22) 0%,transparent 60%),
+    radial-gradient(55% 50% at 100% 0%,rgba(127,196,234,.16) 0%,transparent 55%)}
+.sig-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;
+  gap:clamp(2rem,5vw,4.5rem);align-items:center;width:100%}
+.ticket{border:1px solid var(--line);border-radius:14px;background:var(--panel);
+  padding:1.6rem clamp(1.2rem,2.5vw,2rem)}
+.ticket-head{font-family:var(--mono);font-size:.76rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--coil-lt);border-bottom:1px solid var(--line);
+  padding-bottom:.9rem;margin-bottom:.4rem}
+.tick-line{display:grid;grid-template-columns:4.2rem 1fr;gap:1rem;
+  padding:.95rem 0;border-bottom:1px dashed rgba(233,243,247,.08)}
+.tick-line:last-of-type{border-bottom:0}
+.tick-line time{font-family:var(--mono);font-size:.85rem;font-weight:500;color:var(--copper)}
+.tick-line p{font-size:.95rem;color:var(--frost)}
+.sig-side{text-align:center}
+.sig-readout{font-family:var(--mono);font-weight:500;color:var(--frost);
+  font-size:clamp(3.4rem,7.5vw,6rem);line-height:1;letter-spacing:-.02em}
+.sig-readout small{font-size:.35em;color:var(--steel);vertical-align:.9em;margin-left:.15em}
+#sigBar{display:block;height:4px;border-radius:2px;margin:1.3rem auto 0;max-width:280px;
+  background:linear-gradient(90deg,var(--copper),var(--coil-lt));
+  transform-origin:0 50%;will-change:transform}
+.sig-cap{margin-top:1rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--steel)}
+.sig-close{margin-top:2rem;font-size:1.02rem}
+.sig-close a{color:var(--copper);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(201,98,43,.4)}
+@media (hover:hover){.sig-close a:hover{border-bottom-color:var(--copper)}}
+@media (max-width:899.98px){.sig-grid{grid-template-columns:1fr}.sig-side{order:-1}}
+
+/* ————— process ————— */
+.proc-track{display:grid;grid-template-columns:1fr;gap:1.1rem;margin-top:2.4rem}
+.proc-step{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:1.6rem 1.5rem;position:relative}
+.proc-step b.num{font-family:var(--disp);font-weight:800;font-size:3rem;line-height:1;
+  color:transparent;-webkit-text-stroke:1px var(--coil-lt);display:block;margin-bottom:.7rem}
+.proc-step h3{font-family:var(--disp);font-weight:700;font-size:1.6rem;margin-bottom:.4rem}
+.proc-step p{font-size:.95rem;color:var(--steel)}
+.proc-step p strong{color:var(--frost)}
+@media (min-width:600px){.proc-track{grid-template-columns:1fr 1fr}}
+/* horizontal mode — applied by JS on desktop only */
+.proc.h{display:flex;flex-direction:column;justify-content:center;min-height:100vh;overflow:hidden}
+.proc.h .proc-track{display:flex;flex-wrap:nowrap;width:max-content;gap:1.4rem;will-change:transform}
+.proc.h .proc-step{width:min(400px,38vw);flex:none}
+
+/* ————— proof ————— */
+.proof-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  gap:1.1rem;margin-top:2.4rem}
+.quote{will-change:transform}
+.q-in{height:100%;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:1.6rem 1.5rem;display:flex;flex-direction:column;gap:1rem}
+.q-in blockquote{font-size:1rem;color:var(--frost);line-height:1.6}
+.q-in blockquote::before{content:"“";display:block;font-family:var(--disp);font-size:2.6rem;
+  line-height:.5;color:var(--coil);margin-bottom:.6rem}
+.q-in figcaption{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--steel);margin-top:auto}
+
+/* ————— coverage map ————— */
+.map-wrap{display:grid;grid-template-columns:1fr;gap:2rem;margin-top:2.2rem}
+@media (min-width:900px){.map-wrap{grid-template-columns:.9fr 1.1fr;align-items:center}}
+.map-svg{width:100%;height:auto;display:block}
+#coast{stroke:var(--coil);stroke-width:1.6;fill:rgba(47,134,196,.06)}
+.tamar{stroke:var(--steel);stroke-width:1;stroke-dasharray:3 5;opacity:.5}
+.pin circle{fill:var(--coil-lt)}
+.pin.hq circle{fill:var(--copper)}
+.pin text{font-family:var(--mono);font-size:10.5px;fill:var(--frost);letter-spacing:.04em}
+.map-region{font-family:var(--mono);font-size:11px;fill:var(--steel);letter-spacing:.3em}
+.map-note{color:var(--steel);max-width:46ch}
+.map-note strong{color:var(--frost)}
+
+/* ————— compliance ————— */
+.comp-in{border:1px solid var(--line);border-left:3px solid var(--coil);border-radius:14px;
+  background:var(--panel);padding:1.8rem clamp(1.3rem,3vw,2.4rem);max-width:860px}
+.comp-in p{color:var(--steel);margin-top:.4rem}
+.comp-in p strong{color:var(--frost)}
+
+/* ————— contact ————— */
+.contact-grid{display:grid;grid-template-columns:1fr;gap:1.4rem;margin-top:2.4rem}
+@media (min-width:900px){.contact-grid{grid-template-columns:1.1fr .9fr}}
+.contact-col{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:1.8rem 1.6rem}
+.big-tel{font-family:var(--disp);font-weight:800;font-size:clamp(2rem,4.6vw,3.4rem);
+  color:var(--frost);text-decoration:none;line-height:1.1;display:inline-block}
+@media (hover:hover){.big-tel:hover{color:var(--coil-lt)}}
+.emg{margin-top:1.3rem;border-left:3px solid var(--copper);padding:.8rem 1.1rem;
+  background:rgba(201,98,43,.08);border-radius:0 8px 8px 0}
+.emg strong{color:var(--copper)}
+.emg a{color:var(--frost);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(233,243,247,.3)}
+address{font-style:normal;margin-top:1.4rem;color:var(--steel);font-size:.95rem;line-height:1.8}
+address a{color:var(--frost)}
+.hours{margin-top:1rem;font-family:var(--mono);font-size:.8rem;color:var(--steel);line-height:1.9}
+.hours b{color:var(--frost);font-weight:500}
+.f-label{display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--steel);margin:0 0 .35rem}
+.f-row{margin-bottom:1rem}
+input,textarea{width:100%;background:rgba(10,30,40,.7);border:1px solid rgba(233,243,247,.16);
+  border-radius:8px;color:var(--frost);font-family:var(--body);font-size:1rem;
+  padding:.7rem .85rem}
+input:focus,textarea:focus{outline:2px solid var(--coil-lt);outline-offset:1px;border-color:transparent}
+textarea{min-height:110px;resize:vertical}
+.form-note{font-size:.85rem;color:var(--steel);margin-top:.8rem}
+
+/* ————— footer ————— */
+footer{border-top:1px solid var(--line);padding:1.8rem 0 2.2rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--steel)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
+
+/* ————— reduced motion / no-js: full static page ————— */
+@media (prefers-reduced-motion:reduce){
+  .rail,.chip,.cue{display:none}
+  .trust-wrap,.sig-wrap{height:auto}
+  .trust,.sig{position:static;min-height:0}
+  .trust{padding:clamp(4rem,9vh,7rem) 0}
+  .sig{padding:clamp(4rem,9vh,7rem) 0}
+}
+.no-js .trust-wrap,.no-js .sig-wrap{height:auto}
+.no-js .trust,.no-js .sig{position:static;min-height:0;padding:clamp(4rem,9vh,7rem) 0}
+.no-js .cue{display:none}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<div class="env" aria-hidden="true">
+  <div class="env-base"></div>
+  <div id="envWarm"></div>
+  <div id="envDeep"></div>
+</div>
+
+<!-- thermometer rail — decorative, driven by scroll -->
+<div class="rail" aria-hidden="true">
+  <div class="rail-readout"><span id="railTemp">+32.0</span><em>°C</em></div>
+  <div class="rail-track">
+    <span id="railMerc"></span>
+    <i style="top:4%">+30</i><i style="top:24%">+20</i><i style="top:44%">+10</i>
+    <i style="top:64%">0</i><i style="top:84%">−10</i>
+  </div>
+</div>
+<div class="chip" aria-hidden="true"><span id="chipTemp">+32.0°C</span></div>
+
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top" aria-label="ASR Cooling — home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="url(#bg1)" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+      <defs><linearGradient id="bg1" x1="0" y1="0" x2="24" y2="24">
+        <stop offset="0" stop-color="#7FC4EA"/><stop offset="1" stop-color="#2F86C4"/>
+      </linearGradient></defs>
+      <path d="M12 2v20M3.3 7l17.4 10M20.7 7L3.3 17M12 5.5l2.5-2M12 5.5l-2.5-2M12 18.5l2.5 2M12 18.5l-2.5 2"/>
+    </svg>
+    <b>ASR&nbsp;Cooling</b>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#process">How it works</a></li>
+    <li><a href="#coverage">Coverage</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a class="nav-call" href="tel:+441326755432">01326 755432</a>
+</nav>
+
+<main id="main">
+
+<!-- ═══ 1 · HERO ═══ -->
+<header class="hero" id="top">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-mid" aria-hidden="true">
+    <!-- condensing unit, drawn like an install manual -->
+    <svg viewBox="0 0 560 340" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <rect x="24" y="70" width="380" height="200" rx="12"/>
+      <circle cx="140" cy="170" r="66"/>
+      <circle cx="140" cy="170" r="9"/>
+      <path d="M146 116c30 12 40 40 30 64M100 216c-16-28-6-56 16-68M186 200c-12 28-44 36-66 26"/>
+      <path d="M252 108h130M252 132h130M252 156h130M252 180h130M252 204h130M252 228h130"/>
+      <path d="M64 270v20M364 270v20"/>
+      <path d="M404 196h58c14 0 22 8 22 22v96"/>
+      <path d="M404 236h38c10 0 16 6 16 16v62" stroke-dasharray="1 7"/>
+      <circle cx="484" cy="252" r="2.4" fill="currentColor" stroke="none"/>
+      <circle cx="484" cy="276" r="2" fill="currentColor" stroke="none"/>
+      <circle cx="459" cy="290" r="1.8" fill="currentColor" stroke="none"/>
+      <circle cx="472" cy="120" r="26"/>
+      <path d="M472 120l12-14M472 104v-8M451 130l-8 4M493 130l8 4"/>
+      <path d="M472 146c0 22-10 28-10 50"/>
+    </svg>
+  </div>
+  <div class="hero-fg wrap">
+    <p class="hero-kicker">Commercial refrigeration · Air con · Cellar cooling — Cornwall &amp; West Devon</p>
+    <h1>Your walk-in's sitting at <mark>+8°C</mark> and service starts at six.</h1>
+    <p class="hero-sub">We get commercial fridges, air conditioning and cellar cooling running again — <strong>usually the same day</strong>. Based in Falmouth, on the road across Cornwall and West Devon. When you ring, an engineer answers. Not a call centre, not a queue.</p>
+    <div class="hero-cta">
+      <a class="btn btn-hot" href="tel:+441326755432">Call 01326 755432</a>
+      <a class="btn btn-ghost" href="tel:+447495639294">Out of hours: 07495 639294</a>
+    </div>
+    <p class="hero-cred">F-Gas certified · REFCOM registered · Fully insured</p>
+  </div>
+  <p class="cue" aria-hidden="true">Scroll — it gets colder
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 4v14m0 0l-5-5m5 5l5-5"/></svg>
+  </p>
+</header>
+
+<!-- ═══ 2 · TRUST ═══ -->
+<div class="trust-wrap">
+  <section class="trust" aria-label="Why businesses trust ASR Cooling">
+    <div class="wrap">
+      <p class="label">Before you scroll further</p>
+      <h2>The numbers that matter when the temperature's climbing</h2>
+      <div class="trust-grid">
+        <div class="trust-item">
+          <span class="stat" data-to="18">18</span>
+          <p><strong>Years on the tools</strong> in commercial refrigeration and air conditioning.</p>
+        </div>
+        <div class="trust-item">
+          <span class="stat">Same day</span>
+          <p><strong>Emergency callouts</strong> across the patch — most reached within working hours.</p>
+        </div>
+        <div class="trust-item">
+          <span class="stat">2</span>
+          <p><strong>Counties covered:</strong> all of Cornwall and West Devon, Penzance to Plymouth.</p>
+        </div>
+        <div class="trust-item">
+          <span class="stat">1st visit</span>
+          <p><strong>Most repairs finished first time</strong> — vans carry fans, controls, gas and common parts.</p>
+        </div>
+      </div>
+      <p class="cred-row">
+        <span>F-Gas certified engineers</span>
+        <span>REFCOM registered</span>
+        <span>Fully insured</span>
+        <span>Trained by Daikin · Mitsubishi Electric · Hoshizaki</span>
+      </p>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ 3 · SERVICES ═══ -->
+<section id="services" aria-label="Services">
+  <div class="wrap">
+    <p class="label">What we work on</p>
+    <h2>If it should be cold and isn't, it's our job</h2>
+    <p class="lede">Install, repair and planned service across the kit a food business actually runs on.</p>
+    <div class="svc-grid">
+
+      <article class="svc"><div class="svc-in">
+        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <rect x="4" y="10" width="40" height="26" rx="3"/>
+          <circle cx="16" cy="23" r="8"/><circle cx="16" cy="23" r="1.6"/>
+          <path d="M17 15.5c3.5 1.5 4.6 5 3.4 7.8M11 29c-2-3.4-.6-6.8 2-8.2"/>
+          <path d="M29 16h10M29 20.5h10M29 25h10M29 29.5h10M10 36v3M38 36v3"/>
+        </svg>
+        <h3>Refrigeration repair &amp; install</h3>
+        <p>Walk-ins, prep counters, bottle coolers, blast chillers. Fault found and fixed — or replaced with kit sized for the site, not the catalogue.</p>
+        <span class="svc-tag">Install · Repair · Re-gas</span>
+      </div></article>
+
+      <article class="svc"><div class="svc-in">
+        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <rect x="8" y="8" width="32" height="32" rx="2"/>
+          <rect x="17" y="17" width="14" height="14" rx="1"/>
+          <path d="M12 12.5h6M30 12.5h6M12 35.5h6M30 35.5h6" transform="rotate(0)"/>
+          <path d="M13 44l-3 3M35 44l3 3M24 44v4" stroke-dasharray="1 3"/>
+        </svg>
+        <h3>Air conditioning</h3>
+        <p>Splits, multi-splits and ceiling cassettes for dining rooms, kitchens and offices. Heat-load calculated and sized properly — not guessed. Daikin and Mitsubishi Electric trained.</p>
+        <span class="svc-tag">Split · Multi · Cassette</span>
+      </div></article>
+
+      <article class="svc"><div class="svc-in">
+        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <rect x="6" y="6" width="36" height="15" rx="2"/>
+          <path d="M10 10.5h28M10 14h28M10 17.5h28"/>
+          <path d="M14 26c0 2 0 3 1 4M24 26c0 3 0 4 0 6M34 26c0 2 0 3-1 4" stroke-dasharray="1 3"/>
+          <rect x="17" y="32" width="14" height="12" rx="4"/>
+          <path d="M17 36.5h14M17 40h14"/>
+        </svg>
+        <h3>Cellar cooling</h3>
+        <p>Through-wall and remote cellar systems held at 11–13°C so the beer keeps and the lines run clean. Emergency swap-outs when one dies on a Friday afternoon.</p>
+        <span class="svc-tag">11–13°C held</span>
+      </div></article>
+
+      <article class="svc"><div class="svc-in">
+        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <rect x="10" y="5" width="28" height="38" rx="3"/>
+          <path d="M10 19h28"/>
+          <path d="M33 11.5h.01M29 11.5h.01"/>
+          <rect x="17" y="25" width="6" height="6" rx="1"/>
+          <rect x="26" y="30" width="6" height="6" rx="1"/>
+          <rect x="19" y="34" width="6" height="6" rx="1" transform="rotate(8 22 37)"/>
+        </svg>
+        <h3>Ice machines</h3>
+        <p>Hoshizaki-trained supply, service and descale. Clean water paths, full bins, no grey build-up — and no borrowed bags of ice from the shop next door.</p>
+        <span class="svc-tag">Supply · Service · Descale</span>
+      </div></article>
+
+      <article class="svc"><div class="svc-in">
+        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <rect x="12" y="4" width="24" height="40" rx="2"/>
+          <path d="M12 10h-3M12 38h-3"/>
+          <rect x="30" y="21" width="3" height="7" rx="1.5"/>
+          <path d="M17 4v40" stroke-dasharray="2 4"/>
+          <path d="M40 12v6M40 15h4M42 26h2M40 30h4" stroke-width="1.2"/>
+        </svg>
+        <h3>Cold rooms &amp; cabinets</h3>
+        <p>Panels, doors, evaporators, controllers and front-of-house display cabinets. Repairs and re-gassing through to full cold room builds.</p>
+        <span class="svc-tag">Build · Repair · Retrofit</span>
+      </div></article>
+
+      <article class="svc"><div class="svc-in">
+        <svg class="svc-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+          <circle cx="15" cy="14" r="8"/><circle cx="33" cy="14" r="8"/>
+          <path d="M15 14l4-4M33 14l-2-5"/>
+          <path d="M15 22c0 8-3 10-3 18M33 22c0 8 3 10 3 18"/>
+          <path d="M21 14h6"/>
+          <path d="M25 32h14v10H25zM28 36h8M28 39h5" stroke-width="1.3"/>
+        </svg>
+        <h3>Maintenance &amp; F-Gas</h3>
+        <p>Planned visits that catch a failing fan before service does — with leak testing at the legal intervals and your logbook kept audit-ready.</p>
+        <span class="svc-tag">Contract · Compliance</span>
+      </div></article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 4 · SIGNATURE: THE PULL-DOWN ═══ -->
+<div class="sig-wrap">
+  <section class="sig" aria-label="A real callout, hour by hour">
+    <div class="sig-frost" aria-hidden="true"></div>
+    <div class="wrap sig-grid">
+      <div class="ticket">
+        <p class="ticket-head">Job №2214 · Pub kitchen, Helston · A Tuesday in August</p>
+        <div class="tick-line"><time>13:42</time><p>Landlord calls: walk-in freezer at +9°C and climbing, stock starting to soften. Call answered on the second ring.</p></div>
+        <div class="tick-line"><time>14:31</time><p>Engineer on site. Fault found in twenty minutes — condenser fan seized, head pressure through the roof.</p></div>
+        <div class="tick-line"><time>15:50</time><p>Fan motor swapped from van stock. System leak-tested, recharged, pull-down started.</p></div>
+        <div class="tick-line"><time>17:15</time><p>−18°C. Stock checked, logbook updated, signed off before the evening service.</p></div>
+        <p class="sig-close">That's the whole pitch. If your readout's climbing, <a href="tel:+441326755432">call 01326 755432</a> before the stock's gone.</p>
+      </div>
+      <div class="sig-side" aria-hidden="true">
+        <p class="sig-readout"><span id="sigTemp">−18.0</span><small>°C</small></p>
+        <span id="sigBar"></span>
+        <p class="sig-cap">Cabinet temperature · scroll = pull-down</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ 5 · PROCESS ═══ -->
+<section id="process" class="proc" aria-label="How a callout works">
+  <div class="wrap">
+    <p class="label">How it works</p>
+    <h2>Four steps between a warm fridge and a cold one</h2>
+    <div class="proc-track">
+      <article class="proc-step">
+        <b class="num" aria-hidden="true">01</b>
+        <h3>Call</h3>
+        <p><strong>01326 755432.</strong> You get a person who knows the kit — no menu, no ticket number. Out of hours, the mobile rings an engineer directly.</p>
+      </article>
+      <article class="proc-step">
+        <b class="num" aria-hidden="true">02</b>
+        <h3>Diagnose</h3>
+        <p>We fault-find on site and tell you what's wrong in plain terms — <strong>and what it costs to put right, before any work starts.</strong></p>
+      </article>
+      <article class="proc-step">
+        <b class="num" aria-hidden="true">03</b>
+        <h3>Quote</h3>
+        <p>Fixed price for the fix. <strong>If the kit isn't worth saving, we say so</strong> and quote a replacement instead of billing you twice.</p>
+      </article>
+      <article class="proc-step">
+        <b class="num" aria-hidden="true">04</b>
+        <h3>Fix</h3>
+        <p><strong>Most repairs finish on the first visit.</strong> If a part's on order, we rig you through in the meantime — stock doesn't wait for couriers.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 6 · PROOF ═══ -->
+<section aria-label="What customers say">
+  <div class="wrap">
+    <p class="label">On the record</p>
+    <h2>Three calls that went the way calls should</h2>
+    <div class="proof-grid">
+      <figure class="quote"><div class="q-in">
+        <blockquote>The cellar cooler went on Good Friday with a full cellar and a band booked. Ryan answered, was here by half ten, and we never poured a warm pint. We've been on a maintenance contract since.</blockquote>
+        <figcaption>Landlord · Harbourside pub, Falmouth</figcaption>
+      </div></figure>
+      <figure class="quote"><div class="q-in">
+        <blockquote>They look after our display cabinets and the cold room. Twice-a-year service, leak checks done and logged without us chasing. Nothing has broken down since they took it on.</blockquote>
+        <figcaption>Owner · Farm shop, near Truro</figcaption>
+      </div></figure>
+      <figure class="quote"><div class="q-in">
+        <blockquote>The kitchen hit 34 degrees in the August heat and the chef was threatening to walk. Two cassettes fitted midweek without losing a single service.</blockquote>
+        <figcaption>Manager · Restaurant, Penzance</figcaption>
+      </div></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 7 · COVERAGE ═══ -->
+<section id="coverage" aria-label="Area covered">
+  <div class="wrap">
+    <p class="label">Where we go</p>
+    <h2>Penzance to Plymouth, the coast to the moor</h2>
+    <div class="map-wrap">
+      <p class="map-note"><strong>Based in Falmouth, on the road daily across Cornwall and West Devon.</strong> Town or farm track, harbourside or industrial estate — if you're on this map, you're on the round. Near the edge of it? Call anyway; the van's usually closer than you think.</p>
+      <svg class="map-svg" viewBox="0 0 560 380" role="img" aria-label="Stylised map of Cornwall and West Devon showing towns covered, with the Falmouth base marked">
+        <path id="coast" fill-rule="evenodd" d="M28 272
+          C 64 246 108 224 148 206 C 176 194 200 176 216 152
+          C 232 130 252 122 268 112 C 296 92 316 66 336 52
+          C 356 44 388 48 412 56 C 444 64 478 60 506 72
+          C 524 82 534 104 528 124 C 522 146 510 160 504 176
+          C 498 198 502 222 494 240 C 482 258 458 256 436 250
+          C 410 244 386 252 362 250 C 340 248 326 238 308 238
+          C 284 240 262 258 244 276 C 232 288 226 306 210 330
+          C 198 346 178 340 168 326 C 158 314 150 304 134 300
+          C 116 296 98 306 84 310 C 64 314 40 296 28 272 Z"/>
+        <path class="tamar" d="M414 58 C 430 110 450 180 492 238"/>
+        <text class="map-region" x="150" y="120">CORNWALL</text>
+        <text class="map-region" x="536" y="44" text-anchor="end">WEST DEVON</text>
+        <g class="pin"><circle cx="108" cy="298" r="4"/><text x="100" y="320" text-anchor="middle">Penzance</text></g>
+        <g class="pin"><circle cx="198" cy="294" r="4"/><text x="198" y="316" text-anchor="middle">Helston</text></g>
+        <g class="pin hq"><circle cx="244" cy="276" r="6"/><text x="256" y="292">Falmouth · HQ</text></g>
+        <g class="pin"><circle cx="204" cy="240" r="4"/><text x="196" y="230" text-anchor="middle">Redruth</text></g>
+        <g class="pin"><circle cx="256" cy="244" r="4"/><text x="268" y="240">Truro</text></g>
+        <g class="pin"><circle cx="222" cy="162" r="4"/><text x="222" y="152" text-anchor="middle">Newquay</text></g>
+        <g class="pin"><circle cx="322" cy="230" r="4"/><text x="330" y="222">St Austell</text></g>
+        <g class="pin"><circle cx="318" cy="184" r="4"/><text x="306" y="176" text-anchor="middle">Bodmin</text></g>
+        <g class="pin"><circle cx="388" cy="212" r="4"/><text x="392" y="202">Liskeard</text></g>
+        <g class="pin"><circle cx="424" cy="128" r="4"/><text x="414" y="132" text-anchor="end">Launceston</text></g>
+        <g class="pin"><circle cx="336" cy="70" r="4"/><text x="336" y="92" text-anchor="middle">Bude</text></g>
+        <g class="pin"><circle cx="490" cy="90" r="4"/><text x="482" y="112" text-anchor="end">Okehampton</text></g>
+        <g class="pin"><circle cx="496" cy="172" r="4"/><text x="488" y="164" text-anchor="end">Tavistock</text></g>
+        <g class="pin"><circle cx="486" cy="236" r="4"/><text x="478" y="258" text-anchor="end">Plymouth</text></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 8 · COMPLIANCE ═══ -->
+<section class="comp" aria-label="F-Gas and REFCOM compliance, explained">
+  <div class="wrap">
+    <div class="comp-in">
+      <p class="label">The paperwork, in plain English</p>
+      <h2>What F-Gas and REFCOM actually mean for you</h2>
+      <p>Nearly all commercial cooling kit holds F-Gas refrigerant. The law says it must be leak-checked at set intervals, by certified engineers, with records kept — and an EHO visit or an insurance claim is exactly when that folder gets asked for. <strong>REFCOM is the register that audits cooling companies to prove they handle refrigerant legally.</strong></p>
+      <p>Ours is simple: every ASR engineer is F-Gas certified, the company is REFCOM registered, and on a maintenance contract we keep your logbook current without being chased. <strong>When someone asks for the paperwork, the answer is a folder — not a scramble.</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 9 · CONTACT ═══ -->
+<section id="contact" aria-label="Contact ASR Cooling">
+  <div class="wrap">
+    <p class="label">Get it fixed</p>
+    <h2>Warm fridge? Dead cellar? Hot kitchen?</h2>
+    <div class="contact-grid">
+      <div class="contact-col">
+        <a class="big-tel" href="tel:+441326755432">01326 755432</a>
+        <p class="lede" style="margin-top:.4rem">Mon–Fri, 8:00–17:30 — an engineer answers.</p>
+        <div class="emg">
+          <strong>Out of hours emergency:</strong> <a href="tel:+447495639294">07495 639294</a> rings an engineer's mobile, not an answering service. Weekend cellar and walk-in callouts covered.
+        </div>
+        <address>
+          ASR Cooling Ltd<br>
+          Falmouth, Cornwall<br>
+          <a href="mailto:Ryan@ASRcooling.com">Ryan@ASRcooling.com</a><br>
+          Serving all of Cornwall and West Devon
+        </address>
+        <p class="hours"><b>Hours</b> — Mon–Fri 08:00–17:30 · emergency line 7 days</p>
+      </div>
+      <div class="contact-col">
+        <h3 style="font-family:var(--disp);font-weight:700;font-size:1.6rem;margin-bottom:1.1rem">Not urgent? Request a call back</h3>
+        <form id="cbForm" action="mailto:Ryan@ASRcooling.com" method="post" enctype="text/plain">
+          <div class="f-row"><label class="f-label" for="f-name">Your name</label>
+            <input id="f-name" name="name" autocomplete="name" required></div>
+          <div class="f-row"><label class="f-label" for="f-phone">Phone</label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
+          <div class="f-row"><label class="f-label" for="f-pc">Site postcode</label>
+            <input id="f-pc" name="postcode" autocomplete="postal-code"></div>
+          <div class="f-row"><label class="f-label" for="f-msg">What's the problem?</label>
+            <textarea id="f-msg" name="msg" placeholder="e.g. Bottle fridge running warm since the weekend, temp display reads 11°"></textarea></div>
+          <button class="btn btn-hot" type="submit">Request a call back</button>
+          <p class="form-note">Opens in your email app. For anything already warming up, phone — it's faster.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 ASR Cooling Ltd · Registered in England &amp; Wales</span>
+    <span>F-Gas certified · REFCOM registered · Fully insured</span>
+    <span>Falmouth → Cornwall &amp; West Devon</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/CustomEase.min.js"></script>
+<script>
+(function(){
+  var root=document.documentElement;
+  root.classList.remove("no-js");root.classList.add("js");
+  if(!window.gsap||!window.ScrollTrigger)return;
+
+  gsap.registerPlugin(ScrollTrigger,CustomEase);
+  ScrollTrigger.config({ignoreMobileResize:true});
+  /* eases with weight: "settle" = equipment coming to rest, "mech" = valve action */
+  CustomEase.create("settle","0.18,0.72,0.16,1");
+  CustomEase.create("mech","0.55,0.04,0.16,1");
+
+  var $=function(s){return document.querySelector(s)},
+      $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))},
+      fmt=function(t){return (t>0?"+":t<0?"−":"")+Math.abs(t).toFixed(1)};
+
+  var mm=gsap.matchMedia();
+
+  /* reduced motion: no ScrollTriggers at all — the DOM is complete at rest */
+  mm.add("(prefers-reduced-motion: reduce)",function(){});
+
+  mm.add({
+    desk:"(min-width: 900px) and (prefers-reduced-motion: no-preference)",
+    mob:"(max-width: 899.98px) and (prefers-reduced-motion: no-preference)"
+  },function(ctx){
+    var k=ctx.conditions.desk?1:0.4;             /* parallax intensity */
+    var vh=function(){return window.innerHeight};
+
+    /* ── the signature: page-wide temperature journey ── */
+    var railT=$("#railTemp"),chipT=$("#chipTemp");
+    ScrollTrigger.create({start:0,end:"max",scrub:0.6,
+      onUpdate:function(self){
+        var t=32-50*self.progress;
+        if(railT)railT.textContent=fmt(t);
+        if(chipT)chipT.textContent=fmt(t)+"°C";
+      }});
+    gsap.to("#envWarm",{opacity:0,ease:"none",
+      scrollTrigger:{start:0,end:function(){return ScrollTrigger.maxScroll(window)*0.45},scrub:1}});
+    gsap.to("#envDeep",{opacity:1,ease:"none",
+      scrollTrigger:{start:function(){return ScrollTrigger.maxScroll(window)*0.55},end:"max",scrub:1}});
+    gsap.fromTo("#railMerc",{scaleY:1},{scaleY:0.07,ease:"none",
+      scrollTrigger:{start:0,end:"max",scrub:1}});
+
+    /* ── hero: three depths (rates ~.2/.5/.8 → travel .8/.5/.2, scaled) ── */
+    [[".hero-bg",0.36],[".hero-mid",0.22],[".hero-fg",0.09]].forEach(function(pair){
+      gsap.to(pair[0],{y:function(){return vh()*pair[1]*k},ease:"none",
+        scrollTrigger:{trigger:".hero",start:"top top",end:"bottom top",scrub:1,invalidateOnRefresh:true}});
+    });
+    gsap.timeline({defaults:{ease:"settle"}})
+      .from(".hero-kicker",{y:24,opacity:0,duration:0.5})
+      .from(".hero h1",{y:36,opacity:0,duration:0.65},"-=0.25")
+      .from(".hero-sub",{y:24,opacity:0,duration:0.5},"-=0.35")
+      .from(".hero-cta > *",{y:18,opacity:0,duration:0.45,stagger:0.08},"-=0.25")
+      .from(".hero-cred",{opacity:0,duration:0.4},"-=0.15");
+    gsap.to(".cue svg",{y:7,duration:0.9,repeat:-1,yoyo:true,ease:"sine.inOut"});
+
+    /* ── trust: counters + row reveal ── */
+    $$(".stat[data-to]").forEach(function(el){
+      var to=+el.getAttribute("data-to"),obj={v:to};
+      gsap.fromTo(obj,{v:0},{v:to,duration:0.85,ease:"mech",
+        scrollTrigger:{trigger:el,start:"top 85%",toggleActions:"play none none reverse"},
+        onUpdate:function(){el.textContent=Math.round(obj.v)}});
+    });
+    gsap.from($$(".trust-item"),{y:26*k,opacity:0,duration:0.55,ease:"settle",stagger:0.08,
+      scrollTrigger:{trigger:".trust-grid",start:"top 85%",toggleActions:"play none none reverse"}});
+
+    /* ── services: one IntersectionObserver → one staggered timeline ── */
+    var svcTl=gsap.timeline({paused:true,defaults:{ease:"settle"}})
+      .from($$(".svc-in"),{y:40*k,opacity:0,duration:0.6,stagger:0.08});
+    var grid=$(".svc-grid");
+    if(grid&&"IntersectionObserver" in window){
+      var io=new IntersectionObserver(function(es,o){
+        es.forEach(function(e){if(e.isIntersecting){svcTl.play();o.disconnect();}});
+      },{rootMargin:"0px 0px -12% 0px"});
+      io.observe(grid);
+      ctx.add(function(){return function(){io.disconnect()}});
+    }else{svcTl.play()}
+    /* per-card depth drift at slightly different rates */
+    $$(".svc").forEach(function(c,i){
+      gsap.to(c,{y:-(8+(i%3)*9)*k,ease:"none",
+        scrollTrigger:{trigger:".svc-grid",start:"top bottom",end:"bottom top",scrub:1.2}});
+    });
+
+    /* ── signature section: the pull-down, scrubbed ── */
+    var lines=$$(".tick-line"),sigT=$("#sigTemp"),proxy={t:9};
+    gsap.set(lines,{opacity:0.25});
+    gsap.set(".sig-frost",{opacity:0});
+    var sig=gsap.timeline({defaults:{ease:"none"},
+      scrollTrigger:{trigger:".sig-wrap",start:"top top",end:"bottom bottom",scrub:0.6}});
+    sig.to(proxy,{t:-18,duration:1,onUpdate:function(){if(sigT)sigT.textContent=fmt(proxy.t)}},0);
+    sig.fromTo("#sigBar",{scaleX:0},{scaleX:1,duration:1},0);
+    lines.forEach(function(ln,i){sig.to(ln,{opacity:1,duration:0.07},0.06+i*0.23)});
+    sig.to(".sig-frost",{opacity:0.55,duration:0.28},0.72);
+
+    /* ── process: horizontal scrub on desktop, vertical stagger on mobile ── */
+    var proc=$(".proc");
+    if(ctx.conditions.desk&&proc){
+      proc.classList.add("h");
+      var track=$(".proc-track");
+      var dist=function(){return Math.max(0,track.scrollWidth-proc.clientWidth+120)};
+      gsap.to(track,{x:function(){return -dist()},ease:"none",
+        scrollTrigger:{trigger:proc,start:"top top",end:function(){return "+="+(dist()+vh()*0.25)},
+          pin:true,scrub:1,invalidateOnRefresh:true}});
+      gsap.from($$(".proc-step"),{y:30,opacity:0,duration:0.5,ease:"settle",stagger:0.1,
+        scrollTrigger:{trigger:proc,start:"top 70%",toggleActions:"play none none reverse"}});
+    }else{
+      gsap.from($$(".proc-step"),{y:34*k,opacity:0,duration:0.55,ease:"settle",stagger:0.1,
+        scrollTrigger:{trigger:".proc-track",start:"top 85%",toggleActions:"play none none reverse"}});
+    }
+
+    /* ── proof: reveal + slight parallax offset from container ── */
+    gsap.from($$(".q-in"),{y:36*k,opacity:0,duration:0.6,ease:"settle",stagger:0.12,
+      scrollTrigger:{trigger:".proof-grid",start:"top 85%",toggleActions:"play none none reverse"}});
+    $$(".quote").forEach(function(q,i){
+      gsap.to(q,{y:-(12+i*9)*k,ease:"none",
+        scrollTrigger:{trigger:".proof-grid",start:"top bottom",end:"bottom top",scrub:1.2}});
+    });
+
+    /* ── coverage: coastline draw + pins ── */
+    var coast=document.getElementById("coast");
+    if(coast&&coast.getTotalLength){
+      var len=coast.getTotalLength();
+      gsap.fromTo(coast,{strokeDasharray:len,strokeDashoffset:len},
+        {strokeDashoffset:0,duration:0.85,ease:"mech",
+         scrollTrigger:{trigger:".map-wrap",start:"top 80%",toggleActions:"play none none reverse"}});
+    }
+    gsap.from($$(".pin"),{scale:0,opacity:0,transformOrigin:"50% 50%",duration:0.45,ease:"settle",stagger:0.06,
+      scrollTrigger:{trigger:".map-wrap",start:"top 70%",toggleActions:"play none none reverse"}});
+
+    /* ── compliance + contact ── */
+    gsap.from(".comp-in",{y:30*k,opacity:0,duration:0.6,ease:"settle",
+      scrollTrigger:{trigger:".comp",start:"top 85%",toggleActions:"play none none reverse"}});
+    gsap.from($$(".contact-col"),{y:34*k,opacity:0,duration:0.6,ease:"settle",stagger:0.12,
+      scrollTrigger:{trigger:".contact-grid",start:"top 85%",toggleActions:"play none none reverse"}});
+
+    return function(){if(proc)proc.classList.remove("h")};
+  });
+
+  /* refresh once real fonts are in, so start positions are measured correctly */
+  if(document.fonts&&document.fonts.ready){
+    document.fonts.ready.then(function(){ScrollTrigger.refresh()});
+  }
+
+  /* call-back form → prefilled email (native mailto action as no-JS fallback) */
+  var form=document.getElementById("cbForm");
+  if(form){form.addEventListener("submit",function(e){
+    e.preventDefault();
+    var d=new FormData(form);
+    var body="Name: "+(d.get("name")||"")+"\nPhone: "+(d.get("phone")||"")+
+             "\nSite postcode: "+(d.get("postcode")||"—")+"\n\n"+(d.get("msg")||"");
+    location.href="mailto:Ryan@ASRcooling.com?subject="+
+      encodeURIComponent("Call-back request — "+(d.get("name")||"website"))+
+      "&body="+encodeURIComponent(body);
+  })}
+})();
+</script>
+</body>
 </html>
