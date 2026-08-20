@@ -148,23 +148,26 @@ h2{font-family:var(--disp);font-weight:700;font-size:clamp(2rem,4.5vw,3.4rem);
 .lede{color:var(--steel);max-width:56ch}
 section{padding:clamp(4rem,9vh,7rem) 0}
 
-/* ————— hero ————— */
-.hero{position:relative;min-height:100svh;overflow:hidden;
-  display:flex;align-items:flex-end;padding:5.5rem 0 clamp(3rem,8vh,5.5rem)}
-.hero-bg{position:absolute;left:0;right:0;top:-45%;bottom:-8%;will-change:transform;
-  background:
-    repeating-linear-gradient(90deg,rgba(233,243,247,.05) 0 1px,transparent 1px 10px);
-  mask-image:linear-gradient(180deg,transparent 0%,#000 25%,#000 80%,transparent 100%);
-  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 25%,#000 80%,transparent 100%)}
-.hero-mid{position:absolute;right:-4%;top:2%;width:min(60vw,780px);opacity:.5;
-  color:var(--coil-lt);will-change:transform}
-.hero-mid svg{width:100%;height:auto;display:block}
-.hero-fg{position:relative;z-index:2;will-change:transform;width:100%}
+/* ————— the film (hero) ————— */
+.film-wrap{height:760vh}
+.film{position:sticky;top:0;height:100svh;overflow:hidden}
+.scene{position:absolute;inset:0;width:100%;height:100%;display:block;will-change:transform,opacity}
+#hWorld,#rWorld,#acFanA,#acFanB{will-change:transform}
+.film-cap{position:absolute;left:50%;transform:translateX(-50%);bottom:8%;z-index:3;
+  width:min(92%,600px);text-align:center;opacity:0;
+  font-family:var(--mono);font-size:.82rem;letter-spacing:.08em;color:var(--frost);
+  text-transform:uppercase;line-height:1.7;pointer-events:none}
+.film-end{position:absolute;left:0;right:0;top:11%;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:1.1rem;text-align:center;
+  opacity:0;pointer-events:none;padding:0 1.2rem}
+.film-end-line{font-family:var(--disp);font-weight:700;font-size:clamp(1.4rem,3vw,2.2rem);
+  color:var(--frost)}
+.hero-fg{position:absolute;left:0;right:0;bottom:9%;z-index:2;width:100%}
 .hero-kicker{font-family:var(--mono);font-size:.8rem;font-weight:500;letter-spacing:.16em;
   text-transform:uppercase;color:var(--coil-lt);margin-bottom:1.1rem}
-.hero h1{font-family:var(--disp);font-weight:800;line-height:.98;letter-spacing:.005em;
+.film h1{font-family:var(--disp);font-weight:800;line-height:.98;letter-spacing:.005em;
   font-size:clamp(2.6rem,8vw,6.4rem);max-width:14ch}
-.hero h1 mark{background:none;color:var(--copper)}
+.film h1 mark{background:none;color:var(--copper)}
 .hero-sub{margin:1.3rem 0 1.8rem;max-width:52ch;color:var(--steel);font-size:1.06rem}
 .hero-sub strong{color:var(--frost);font-weight:600}
 .hero-cta{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center}
@@ -181,9 +184,8 @@ section{padding:clamp(4rem,9vh,7rem) 0}
   color:var(--steel);display:flex;flex-direction:column;align-items:center;gap:.3rem}
 .cue svg{width:14px;height:14px;stroke:var(--coil-lt)}
 
-/* ————— trust (sticky) ————— */
-.trust-wrap{height:135vh}
-.trust{position:sticky;top:0;min-height:100svh;display:flex;align-items:center}
+/* ————— trust ————— */
+.trust{padding:clamp(4rem,9vh,7rem) 0}
 .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);
   border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:2.2rem}
 .trust-item{background:var(--panel);padding:1.6rem 1.4rem}
@@ -226,7 +228,7 @@ section{padding:clamp(4rem,9vh,7rem) 0}
   text-transform:uppercase;color:var(--coil-lt)}
 .scene-frame{border:1px solid var(--line);border-radius:14px;background:rgba(9,26,35,.5);overflow:hidden}
 #scene{display:block;width:100%;height:clamp(230px,38vh,420px)}
-#scene text.scene-txt{font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+text.scene-txt{font-family:var(--mono);font-size:12px;letter-spacing:.08em;
   fill:#8AA3B2;stroke:none}
 #worldFar,#worldMid,#worldMain,#van,#wheelA,#wheelB,#pubFan{will-change:transform}
 .sig-strip{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:1.1rem;align-items:stretch}
@@ -362,13 +364,17 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
 /* ————— reduced motion / no-js: full static page ————— */
 @media (prefers-reduced-motion:reduce){
   .rail,.chip,.cue{display:none}
-  .trust-wrap,.sig-wrap{height:auto}
-  .trust,.sig{position:static;min-height:0}
-  .trust{padding:clamp(4rem,9vh,7rem) 0}
-  .sig{padding:clamp(4rem,9vh,7rem) 0}
+  .sig-wrap,.film-wrap{height:auto}
+  .sig{position:static;min-height:0;padding:clamp(4rem,9vh,7rem) 0}
+  .film{position:relative;height:auto;min-height:100svh}
+  #houseScene,#restScene,.film-cap,.film-end{display:none}
+  .film .hero-fg{position:relative;bottom:auto;padding:7rem 0 4rem}
 }
-.no-js .trust-wrap,.no-js .sig-wrap{height:auto}
-.no-js .trust,.no-js .sig{position:static;min-height:0;padding:clamp(4rem,9vh,7rem) 0}
+.no-js .sig-wrap,.no-js .film-wrap{height:auto}
+.no-js .sig{position:static;min-height:0;padding:clamp(4rem,9vh,7rem) 0}
+.no-js .film{position:relative;height:auto;min-height:100svh}
+.no-js #houseScene,.no-js #restScene,.no-js .film-cap,.no-js .film-end{display:none}
+.no-js .film .hero-fg{position:relative;bottom:auto;padding:7rem 0 4rem}
 .no-js .cue{display:none}
 </style>
 </head>
@@ -414,43 +420,234 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
 <main id="main">
 
 <!-- ═══ 1 · HERO ═══ -->
-<header class="hero" id="top">
-  <div class="hero-bg" aria-hidden="true"></div>
-  <div class="hero-mid" aria-hidden="true">
-    <!-- condensing unit, drawn like an install manual -->
-    <svg viewBox="0 0 560 340" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-      <rect x="24" y="70" width="380" height="200" rx="12"/>
-      <circle cx="140" cy="170" r="66"/>
-      <g id="heroFan">
-        <circle cx="140" cy="170" r="9"/>
-        <path d="M146 116c30 12 40 40 30 64M100 216c-16-28-6-56 16-68M186 200c-12 28-44 36-66 26"/>
+<header class="film-wrap" id="top">
+  <div class="film">
+
+    <!-- SCENE 1 · the sky -->
+    <svg id="skyScene" class="scene" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <circle id="dawn" cx="920" cy="130" r="150" fill="#C9622B" opacity=".1"/>
+      <g fill="none" stroke="#7FC4EA" stroke-width="1.5" stroke-linecap="round" opacity=".5">
+        <path d="M300 140 q9 -9 18 0 M324 146 q9 -9 18 0"/>
+        <path d="M860 210 q9 -9 18 0"/>
       </g>
-      <path d="M252 108h130M252 132h130M252 156h130M252 180h130M252 204h130M252 228h130"/>
-      <path d="M64 270v20M364 270v20"/>
-      <path d="M404 196h58c14 0 22 8 22 22v96"/>
-      <path d="M404 236h38c10 0 16 6 16 16v62" stroke-dasharray="1 7"/>
-      <circle class="bead" cx="484" cy="252" r="2.4" fill="currentColor" stroke="none"/>
-      <circle class="bead" cx="484" cy="276" r="2" fill="currentColor" stroke="none"/>
-      <circle class="bead" cx="459" cy="290" r="1.8" fill="currentColor" stroke="none"/>
-      <circle cx="472" cy="120" r="26"/>
-      <path id="heroNeedle" d="M472 120l12-14"/>
-      <path d="M472 104v-8M451 130l-8 4M493 130l8 4"/>
-      <path d="M472 146c0 22-10 28-10 50"/>
+      <g id="cl1" fill="rgba(233,243,247,.06)">
+        <ellipse cx="140" cy="290" rx="130" ry="30"/><ellipse cx="250" cy="278" rx="90" ry="24"/>
+        <ellipse cx="560" cy="300" rx="150" ry="32"/><ellipse cx="670" cy="288" rx="90" ry="22"/>
+        <ellipse cx="980" cy="292" rx="160" ry="34"/><ellipse cx="1100" cy="280" rx="90" ry="24"/>
+      </g>
+      <g id="cl2" fill="rgba(233,243,247,.09)">
+        <ellipse cx="220" cy="490" rx="200" ry="44"/><ellipse cx="380" cy="470" rx="120" ry="34"/>
+        <ellipse cx="720" cy="500" rx="230" ry="48"/><ellipse cx="900" cy="478" rx="130" ry="36"/>
+        <ellipse cx="1130" cy="495" rx="150" ry="38"/>
+      </g>
+      <g id="cl3" fill="rgba(233,243,247,.13)">
+        <ellipse cx="160" cy="680" rx="260" ry="60"/><ellipse cx="420" cy="660" rx="180" ry="48"/>
+        <ellipse cx="700" cy="690" rx="280" ry="64"/><ellipse cx="960" cy="662" rx="190" ry="50"/>
+        <ellipse cx="1180" cy="688" rx="180" ry="52"/>
+      </g>
     </svg>
-  </div>
-  <div class="hero-fg wrap">
-    <p class="hero-kicker">Commercial refrigeration · Air con · Cellar cooling — Cornwall &amp; West Devon</p>
-    <h1>Your walk-in's sitting at <mark>+8°C</mark> and service starts at six.</h1>
-    <p class="hero-sub">We get commercial fridges, air conditioning and cellar cooling running again — <strong>usually the same day</strong>. Based in Falmouth, on the road across Cornwall and West Devon. When you ring, an engineer answers. Not a call centre, not a queue.</p>
-    <div class="hero-cta">
-      <a class="btn btn-hot" href="tel:+441326755432">Call 01326 755432</a>
-      <a class="btn btn-ghost" href="tel:+447495639294">Out of hours: 07495 639294</a>
+
+    <!-- SCENE 2 · the farmhouse -->
+    <svg id="houseScene" class="scene" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" opacity="0" aria-hidden="true">
+      <g id="hWorld" fill="none" stroke="#7FC4EA" stroke-width="2" stroke-linecap="round">
+        <path d="M-200 640 H3300" stroke="#54798D"/>
+        <path d="M-100 640 c60 -18 140 -22 220 -14 M840 640 c70 -16 150 -18 230 -10 M2150 640 c60 -14 130 -16 200 -10" stroke="#39647F" stroke-width="1.5"/>
+        <!-- front elevation -->
+        <g id="houseFill">
+          <rect x="340" y="430" width="420" height="210" fill="#0B2530"/>
+          <path d="M320 430 L550 296 L780 430 Z" fill="#0B2530"/>
+          <rect x="688" y="330" width="36" height="76" fill="#0B2530"/>
+          <rect x="500" y="540" width="64" height="100"/>
+          <circle cx="552" cy="592" r="2.2" fill="#7FC4EA" stroke="none"/>
+          <rect x="388" y="470" width="82" height="70"/>
+          <path d="M429 470 v70 M388 505 h82"/>
+          <rect x="640" y="470" width="82" height="70"/>
+          <path d="M681 470 v70 M640 505 h82"/>
+          <text class="scene-txt" x="550" y="676" text-anchor="middle">FARMHOUSE · NR HELSTON</text>
+        </g>
+        <path id="housePath" d="M320 430 L550 296 L780 430 M340 430 V640 H760 V430 M688 406 V330 h36 v76"/>
+        <!-- gable wall with the splits -->
+        <g id="gable">
+          <path d="M1340 430 L1580 296 L1820 430 Z" fill="#0B2530"/>
+          <rect x="1360" y="430" width="440" height="210" fill="#0B2530"/>
+          <g id="acA">
+            <rect x="1420" y="470" width="110" height="74" rx="6" fill="#0C2836"/>
+            <circle cx="1462" cy="507" r="24"/>
+            <g id="acFanA"><circle cx="1462" cy="507" r="4"/>
+              <path d="M1466 486 c11 5 14 16 10 26 M1443 519 c-6 -10 -2 -22 7 -27"/></g>
+            <path d="M1502 482 h20 M1502 494 h20 M1502 506 h20 M1502 518 h20"/>
+            <path d="M1448 544 v18 M1510 544 v18"/>
+            <path d="M1452 462 l5 -8 M1457 462 l-5 -8 M1449 458 h11" stroke-width="1.3"/>
+            <text class="scene-txt" x="1516" y="540" text-anchor="end" font-size="9">ASR</text>
+          </g>
+          <g id="acB">
+            <rect x="1640" y="470" width="110" height="74" rx="6" fill="#0C2836"/>
+            <circle cx="1682" cy="507" r="24"/>
+            <g id="acFanB"><circle cx="1682" cy="507" r="4"/>
+              <path d="M1686 486 c11 5 14 16 10 26 M1663 519 c-6 -10 -2 -22 7 -27"/></g>
+            <path d="M1722 482 h20 M1722 494 h20 M1722 506 h20 M1722 518 h20"/>
+            <path d="M1668 544 v18 M1730 544 v18"/>
+            <path d="M1672 462 l5 -8 M1677 462 l-5 -8 M1669 458 h11" stroke-width="1.3"/>
+            <text class="scene-txt" x="1736" y="540" text-anchor="end" font-size="9">ASR</text>
+          </g>
+          <g id="airA" class="film-air" opacity="0" stroke-dasharray="2 5">
+            <path d="M1540 488 q12 14 0 30 M1552 484 q16 18 0 38 M1564 480 q20 22 0 46"/>
+          </g>
+          <g id="airB" class="film-air" opacity="0" stroke-dasharray="2 5">
+            <path d="M1760 488 q12 14 0 30 M1772 484 q16 18 0 38 M1784 480 q20 22 0 46"/>
+          </g>
+        </g>
+        <!-- cutaway: polar room, desert room -->
+        <g id="cutaway">
+          <rect x="2440" y="300" width="520" height="340" fill="#0B2530"/>
+          <path d="M2420 300 L2700 190 L2980 300" fill="none"/>
+          <rect x="2460" y="320" width="230" height="300"/>
+          <rect x="2710" y="320" width="230" height="300"/>
+          <rect x="2510" y="336" width="90" height="24" rx="4"/>
+          <path d="M2518 352 h74" stroke-width="1.3"/>
+          <rect x="2760" y="336" width="90" height="24" rx="4"/>
+          <path d="M2768 352 h74" stroke-width="1.3"/>
+          <g id="coldRoom" opacity="0">
+            <rect x="2462" y="322" width="226" height="296" fill="#2F86C4" opacity=".14" stroke="none"/>
+            <path d="M2470 366 l8 14 8 -14 8 11 8 -11 8 14 8 -14 8 11 8 -11 8 14 8 -14" stroke="#7FC4EA" stroke-width="1.4"/>
+            <circle class="snow-dot" cx="2520" cy="420" r="2.5" fill="#E9F3F7" stroke="none"/>
+            <circle class="snow-dot" cx="2580" cy="450" r="2" fill="#E9F3F7" stroke="none"/>
+            <circle class="snow-dot" cx="2640" cy="410" r="2.2" fill="#E9F3F7" stroke="none"/>
+            <path d="M2555 620 c-9 0 -14 -9 -14 -18 c0 -14 8 -26 14 -26 c6 0 14 12 14 26 c0 9 -5 18 -14 18 z" stroke="#E9F3F7"/>
+            <circle cx="2555" cy="572" r="7" stroke="#E9F3F7"/>
+            <path d="M2562 572 l7 3 M2548 620 h-6 M2562 620 h6" stroke="#E9F3F7" stroke-width="1.4"/>
+            <text class="scene-txt" x="2575" y="652" text-anchor="middle" fill="#7FC4EA">SET 6° · FEELS: ANTARCTIC</text>
+          </g>
+          <g id="hotRoom" opacity="0">
+            <rect x="2712" y="322" width="226" height="296" fill="#C9622B" opacity=".13" stroke="none"/>
+            <circle cx="2880" cy="400" r="18" stroke="#E0793F"/>
+            <path d="M2880 372 v-10 M2880 428 v10 M2852 400 h-10 M2908 400 h10 M2860 380 l-7 -7 M2900 380 l7 -7 M2860 420 l-7 7 M2900 420 l7 7" stroke="#E0793F" stroke-width="1.4"/>
+            <path d="M2780 620 v-70 M2780 570 c-14 0 -22 -8 -22 -22 M2780 586 c14 0 22 -8 22 -24" stroke="#E0793F"/>
+            <path class="heat-wave" d="M2830 560 q6 -12 0 -24 q-6 -12 0 -24" stroke="#E0793F" stroke-width="1.3"/>
+            <path class="heat-wave" d="M2850 570 q6 -12 0 -24 q-6 -12 0 -24" stroke="#E0793F" stroke-width="1.3"/>
+            <text class="scene-txt" x="2825" y="652" text-anchor="middle" fill="#E0793F">SET 28° · FEELS: SAHARA</text>
+          </g>
+        </g>
+      </g>
+    </svg>
+
+    <!-- SCENE 3 · the restaurant -->
+    <svg id="restScene" class="scene" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" opacity="0" aria-hidden="true">
+      <g id="rWorld" fill="none" stroke="#7FC4EA" stroke-width="2" stroke-linecap="round">
+        <path d="M-200 640 H3700" stroke="#54798D"/>
+        <!-- facade -->
+        <g id="facade">
+          <rect x="240" y="300" width="720" height="340" fill="#0B2530"/>
+          <path d="M228 300 h744"/>
+          <rect x="240" y="352" width="720" height="30" fill="#0B2530"/>
+          <rect x="252" y="356" width="56" height="22" fill="#C9622B" opacity=".4" stroke="none"/>
+          <rect x="364" y="356" width="56" height="22" fill="#C9622B" opacity=".4" stroke="none"/>
+          <rect x="476" y="356" width="56" height="22" fill="#C9622B" opacity=".4" stroke="none"/>
+          <rect x="588" y="356" width="56" height="22" fill="#C9622B" opacity=".4" stroke="none"/>
+          <rect x="700" y="356" width="56" height="22" fill="#C9622B" opacity=".4" stroke="none"/>
+          <rect x="812" y="356" width="56" height="22" fill="#C9622B" opacity=".4" stroke="none"/>
+          <text class="scene-txt" x="600" y="340" text-anchor="middle" letter-spacing=".3em">THE HARBOUR KITCHEN</text>
+          <rect x="560" y="480" width="80" height="160"/>
+          <circle cx="600" cy="530" r="14"/>
+          <rect x="300" y="420" width="200" height="140"/>
+          <rect x="302" y="422" width="196" height="136" fill="#C9622B" opacity=".12" stroke="none"/>
+          <rect x="700" y="420" width="200" height="140"/>
+          <rect x="702" y="422" width="196" height="136" fill="#C9622B" opacity=".12" stroke="none"/>
+        </g>
+        <!-- dining room -->
+        <g id="dining">
+          <path d="M1300 300 H3700" stroke-width="1.5" opacity=".6"/>
+          <g>
+            <path d="M1500 300 v66"/>
+            <path d="M1478 366 h44 l-8 14 h-28 z" fill="#0B2530"/>
+            <circle cx="1500" cy="392" r="10" fill="#C9622B" opacity=".14" stroke="none"/>
+            <ellipse cx="1500" cy="560" rx="92" ry="15" fill="#0B2530"/>
+            <path d="M1500 575 v65"/>
+            <path d="M1482 545 v-16 m0 0 l-4 -8 h8 z M1522 545 v-16 m0 0 l-4 -8 h8 z" stroke-width="1.4"/>
+            <circle cx="1396" cy="486" r="15"/>
+            <path d="M1396 501 c-16 6 -22 24 -22 44 v50 M1396 501 c10 4 16 12 18 22" />
+            <circle cx="1604" cy="486" r="15"/>
+            <path d="M1604 501 c16 6 22 24 22 44 v50 M1604 501 c-10 4 -16 12 -18 22"/>
+          </g>
+          <g>
+            <path d="M1940 300 v66"/>
+            <path d="M1918 366 h44 l-8 14 h-28 z" fill="#0B2530"/>
+            <circle cx="1940" cy="392" r="10" fill="#C9622B" opacity=".14" stroke="none"/>
+            <ellipse cx="1940" cy="560" rx="92" ry="15" fill="#0B2530"/>
+            <path d="M1940 575 v65"/>
+            <path d="M1922 545 v-16 m0 0 l-4 -8 h8 z M1962 545 v-16 m0 0 l-4 -8 h8 z" stroke-width="1.4"/>
+            <circle cx="1836" cy="486" r="15"/>
+            <path d="M1836 501 c-16 6 -22 24 -22 44 v50 M1836 501 c10 4 16 12 18 22"/>
+            <circle cx="2044" cy="480" r="15"/>
+            <path d="M2044 495 c16 6 22 24 22 46 v54 M2044 495 c-14 2 -24 -6 -28 -16" />
+          </g>
+          <!-- swing doors -->
+          <rect x="2200" y="380" width="58" height="260" fill="#0B2530"/>
+          <rect x="2262" y="380" width="58" height="260" fill="#0B2530"/>
+          <circle cx="2229" cy="470" r="16"/>
+          <circle cx="2291" cy="470" r="16"/>
+          <path d="M2206 600 h46 M2268 600 h46" stroke-width="1.4"/>
+        </g>
+        <!-- kitchen -->
+        <g id="kitchen">
+          <rect x="2400" y="520" width="300" height="20" fill="#0B2530"/>
+          <path d="M2420 540 v100 M2680 540 v100"/>
+          <path d="M2470 520 v-12 h60 v12 M2480 496 a14 14 0 0 1 40 0" />
+          <path class="heat-wave" d="M2500 484 q5 -10 0 -20 q-5 -10 0 -18" stroke-width="1.3"/>
+          <circle cx="2600" cy="440" r="15"/>
+          <path d="M2588 428 h24 v-16 a12 10 0 0 0 -24 0 z" fill="#0B2530"/>
+          <path d="M2600 455 c-14 6 -20 22 -20 40 v45 h40 v-45 c0 -18 -6 -34 -20 -40 M2618 470 c10 6 22 10 34 8"/>
+          <!-- the walk-ins -->
+          <g id="walkins">
+            <rect x="2820" y="340" width="480" height="300" fill="#0B2530"/>
+            <path d="M2808 340 h504"/>
+            <rect x="2848" y="370" width="180" height="270" rx="3" fill="#0C2836"/>
+            <path d="M2856 380 v20 M2856 610 v20" stroke-width="1.4"/>
+            <rect x="3012" y="480" width="10" height="34" rx="3"/>
+            <rect x="2888" y="410" width="100" height="30" rx="4"/>
+            <text class="scene-txt" x="2938" y="430" text-anchor="middle" fill="#7FC4EA">+3.0°C</text>
+            <text class="scene-txt" x="2938" y="600" text-anchor="middle">COOLER</text>
+            <rect x="3092" y="370" width="180" height="270" rx="3" fill="#0C2836"/>
+            <rect x="3094" y="372" width="176" height="266" fill="#7FC4EA" opacity=".05" stroke="none"/>
+            <path d="M3100 380 v20 M3100 610 v20" stroke-width="1.4"/>
+            <rect x="3256" y="480" width="10" height="34" rx="3"/>
+            <rect x="3132" y="410" width="100" height="30" rx="4"/>
+            <text class="scene-txt" x="3182" y="430" text-anchor="middle" fill="#7FC4EA">−18.0°C</text>
+            <text class="scene-txt" x="3182" y="600" text-anchor="middle">FREEZER</text>
+            <path d="M3055 480 l6 -10 M3061 480 l-6 -10 M3052 475 h12" stroke-width="1.4" stroke="#C9622B"/>
+            <text class="scene-txt" x="3060" y="672" text-anchor="middle" fill="#8AA3B2">SERVICED BY ASR COOLING · 01326 755432</text>
+          </g>
+        </g>
+      </g>
+    </svg>
+
+    <!-- copy overlay: frame zero is still a working hero -->
+    <div class="hero-fg wrap">
+      <p class="hero-kicker">Commercial refrigeration · Air con · Cellar cooling — Cornwall &amp; West Devon</p>
+      <h1>Your walk-in's sitting at <mark>+8°C</mark> and service starts at six.</h1>
+      <p class="hero-sub">We get commercial fridges, air conditioning and cellar cooling running again — <strong>usually the same day</strong>. Based in Falmouth, on the road across Cornwall and West Devon. When you ring, an engineer answers. Not a call centre, not a queue.</p>
+      <div class="hero-cta">
+        <a class="btn btn-hot" href="tel:+441326755432">Call 01326 755432</a>
+        <a class="btn btn-ghost" href="tel:+447495639294">Out of hours: 07495 639294</a>
+      </div>
+      <p class="hero-cred">F-Gas certified · REFCOM registered · Fully insured</p>
     </div>
-    <p class="hero-cred">F-Gas certified · REFCOM registered · Fully insured</p>
+
+    <p class="film-cap" id="capA">Down through the cloud to a farmhouse outside Helston.</p>
+    <p class="film-cap" id="capB">Twin splits on the gable — fitted, gassed and commissioned in a day.</p>
+    <p class="film-cap" id="capC">Every room picks its own climate. Office polar, lounge Sahara — the kit doesn't judge.</p>
+    <p class="film-cap" id="capD">Back up and over the bay — same engineers, bigger kit.</p>
+    <p class="film-cap" id="capE">The walk-ins: cooler at +3, freezer at −18, logged for the EHO.</p>
+
+    <div class="film-end">
+      <p class="film-end-line">From a lounge split to a walk-in freezer — one number.</p>
+      <a class="btn btn-hot" href="tel:+441326755432">Call 01326 755432</a>
+    </div>
+
+    <p class="cue" aria-hidden="true">Scroll — down through the clouds
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 4v14m0 0l-5-5m5 5l5-5"/></svg>
+    </p>
   </div>
-  <p class="cue" aria-hidden="true">Scroll — it gets colder
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M12 4v14m0 0l-5-5m5 5l5-5"/></svg>
-  </p>
 </header>
 
 <!-- ═══ 2 · TRUST ═══ -->
@@ -915,20 +1112,61 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
     gsap.fromTo("#railMerc",{scaleY:1},{scaleY:0.07,ease:"none",
       scrollTrigger:{start:0,end:"max",scrub:1}});
 
-    /* ── hero: three depths (rates ~.2/.5/.8 → travel .8/.5/.2, scaled) ── */
-    [[".hero-bg",0.36],[".hero-mid",0.22],[".hero-fg",0.09]].forEach(function(pair){
-      gsap.to(pair[0],{y:function(){return vh()*pair[1]*k},ease:"none",
-        scrollTrigger:{trigger:".hero",start:"top top",end:"bottom top",scrub:1,invalidateOnRefresh:true}});
-    });
+    /* ── the film: sky → farmhouse → sky → restaurant, all scrubbed ── */
     gsap.timeline({defaults:{ease:"settle"}})
       .from(".hero-kicker",{y:24,opacity:0,duration:0.5})
-      .from(".hero h1",{y:36,opacity:0,duration:0.65},"-=0.25")
+      .from(".film h1",{y:36,opacity:0,duration:0.65},"-=0.25")
       .from(".hero-sub",{y:24,opacity:0,duration:0.5},"-=0.35")
       .from(".hero-cta > *",{y:18,opacity:0,duration:0.45,stagger:0.08},"-=0.25")
       .from(".hero-cred",{opacity:0,duration:0.4},"-=0.15");
     gsap.to(".cue svg",{y:7,duration:0.9,repeat:-1,yoyo:true,ease:"sine.inOut"});
-    /* the condensing unit idles — one thing always quietly turning */
-    gsap.to("#heroFan",{rotation:360,svgOrigin:"140 170",duration:9,repeat:-1,ease:"none"});
+
+    var film=gsap.timeline({defaults:{ease:"none"},
+      scrollTrigger:{trigger:".film-wrap",start:"top top",end:"bottom bottom",scrub:0.7}});
+    /* headline steps aside */
+    film.to(".hero-fg",{autoAlpha:0,y:-50,duration:0.05},0.045);
+    film.to(".cue",{autoAlpha:0,duration:0.03},0.045);
+    /* descent one: fall through the cloud layers */
+    film.to("#cl1",{scale:1.7,y:140,autoAlpha:0,duration:0.10,svgOrigin:"600 290"},0.06);
+    film.to("#cl2",{scale:2.3,y:300,autoAlpha:0,duration:0.11,svgOrigin:"600 485"},0.08);
+    film.to("#cl3",{scale:3,y:460,autoAlpha:0,duration:0.12,svgOrigin:"600 675"},0.10);
+    film.to("#dawn",{autoAlpha:0,duration:0.08},0.10);
+    /* the farmhouse: outline draws, fills arrive */
+    film.fromTo("#houseScene",{autoAlpha:0},{autoAlpha:1,duration:0.05},0.17);
+    film.fromTo("#houseScene",{scale:0.86},{scale:1,duration:0.15,ease:"power1.out"},0.17);
+    film.fromTo("#housePath",{strokeDasharray:2600,strokeDashoffset:2600},
+      {strokeDashoffset:0,duration:0.08},0.185);
+    film.fromTo("#houseFill",{autoAlpha:0},{autoAlpha:1,duration:0.05},0.245);
+    film.to("#capA",{autoAlpha:1,duration:0.03},0.22).to("#capA",{autoAlpha:0,duration:0.03},0.295);
+    /* pan to the gable, units spin up */
+    film.to("#hWorld",{x:-980,duration:0.09,ease:"power1.inOut"},0.31);
+    film.to("#capB",{autoAlpha:1,duration:0.03},0.365).to("#capB",{autoAlpha:0,duration:0.03},0.43);
+    film.to("#acFanA",{rotation:900,svgOrigin:"1462 507",duration:0.20},0.37);
+    film.to("#acFanB",{rotation:900,svgOrigin:"1682 507",duration:0.20},0.385);
+    film.fromTo("#airA",{autoAlpha:0},{autoAlpha:1,duration:0.03},0.385);
+    film.fromTo("#airB",{autoAlpha:0},{autoAlpha:1,duration:0.03},0.40);
+    /* pan to the cutaway: polar room, desert room */
+    film.to("#hWorld",{x:-2100,duration:0.09,ease:"power1.inOut"},0.45);
+    film.to("#coldRoom",{autoAlpha:1,duration:0.05},0.505);
+    film.to("#hotRoom",{autoAlpha:1,duration:0.05},0.525);
+    film.to("#capC",{autoAlpha:1,duration:0.03},0.525).to("#capC",{autoAlpha:0,duration:0.03},0.595);
+    /* ascent: clouds close back over */
+    film.to("#houseScene",{autoAlpha:0,scale:0.9,duration:0.05},0.60);
+    film.to("#cl3",{scale:1,y:0,autoAlpha:1,duration:0.05},0.60);
+    film.to("#cl2",{scale:1,y:0,autoAlpha:1,duration:0.05},0.615);
+    film.to("#cl1",{scale:1,y:0,autoAlpha:1,duration:0.05},0.63);
+    /* descent two: down to the harbour */
+    film.to("#cl1",{scale:1.7,y:140,autoAlpha:0,duration:0.08},0.68);
+    film.to("#cl2",{scale:2.3,y:300,autoAlpha:0,duration:0.09},0.695);
+    film.to("#cl3",{scale:3,y:460,autoAlpha:0,duration:0.10},0.71);
+    film.fromTo("#restScene",{autoAlpha:0},{autoAlpha:1,duration:0.05},0.75);
+    film.fromTo("#restScene",{scale:0.88},{scale:1,duration:0.10,ease:"power1.out"},0.75);
+    film.to("#capD",{autoAlpha:1,duration:0.03},0.79).to("#capD",{autoAlpha:0,duration:0.03},0.85);
+    /* pan past dinner, through the doors, to the walk-ins */
+    film.to("#rWorld",{x:-2450,duration:0.16,ease:"power1.inOut"},0.80);
+    film.to("#capE",{autoAlpha:1,duration:0.03},0.93);
+    film.to(".film-end",{autoAlpha:1,duration:0.04},0.96);
+    film.set(".film-end",{pointerEvents:"auto"},0.97);
 
     /* ── trust: counters + row reveal ── */
     $$(".stat[data-to]").forEach(function(el){
@@ -958,11 +1196,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:.5rem 2rem}
     });
 
     /* ── ambient: every section idles like plant equipment ── */
-    /* hero: condensation drips, gauge needle flickers */
-    gsap.fromTo(".bead",{y:0,opacity:0.9},{y:14,opacity:0,duration:1.9,
-      ease:"power1.in",stagger:0.65,repeat:-1,repeatDelay:0.8});
-    gsap.to("#heroNeedle",{rotation:9,svgOrigin:"472 120",duration:1.6,
-      yoyo:true,repeat:-1,ease:"sine.inOut"});
+    /* film scenes: air streams, snow falls in the polar room, heat rises */
+    gsap.to(".film-air path",{strokeDashoffset:-21,duration:1.5,repeat:-1,ease:"none"});
+    gsap.fromTo(".snow-dot",{y:0,opacity:.9},{y:18,opacity:0,duration:2.2,
+      stagger:0.6,repeat:-1,ease:"none"});
+    gsap.fromTo(".heat-wave",{y:0,opacity:.7},{y:-14,opacity:0,duration:2,
+      stagger:0.5,repeat:-1,ease:"none"});
     /* services: the kit runs */
     gsap.to(".icon-fan",{rotation:360,svgOrigin:"16 23",duration:7,repeat:-1,ease:"none"});
     gsap.to(".icon-air",{y:3,opacity:0.35,duration:1.1,yoyo:true,repeat:-1,ease:"sine.inOut"});
